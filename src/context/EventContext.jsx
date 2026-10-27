@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { generateEventPlan, getFallbackEventPlan } from '../services/gemini';
+import { recalculateAllocations } from '../utils/budgetCalculator';
 
 const STORAGE_KEY = 'eventcraft_ai_event_plan';
 const FORM_DATA_KEY = 'eventcraft_ai_last_form_data';
@@ -106,19 +107,11 @@ export function EventProvider({ children }) {
     setEventData((prev) => {
       if (!prev || !prev.budget || !Array.isArray(prev.budget.allocations)) return prev;
 
-      const updatedAllocations = prev.budget.allocations.map((alloc) => {
-        if (alloc.category === categoryName) {
-          return { ...alloc, allocatedAmount: Math.max(0, Number(newAmount) || 0) };
-        }
-        return alloc;
-      });
-
-      const newTotal = updatedAllocations.reduce((sum, item) => sum + (item.allocatedAmount || 0), 0);
-
-      const normalizedAllocations = updatedAllocations.map((item) => ({
-        ...item,
-        percentage: newTotal > 0 ? Math.round((item.allocatedAmount / newTotal) * 100) : 0,
-      }));
+      const { allocations: normalizedAllocations, totalBudget: newTotal } = recalculateAllocations(
+        prev.budget.allocations,
+        categoryName,
+        newAmount
+      );
 
       return {
         ...prev,

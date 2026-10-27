@@ -17,11 +17,11 @@
 - [x] Build Creative Theme & Idea Showcase cards.
 
 ## Phase 4: Polish, Testing & Accessibility
-- [ ] Run Accessibility Audit (ARIA labels, keyboard navigation, color contrast check).
-- [ ] Write unit tests for budget calculation logic and JSON parsing fallback.
-- [ ] Optimize bundle size (< 10 MB repo size enforcement).
+- [x] Run Accessibility Audit (ARIA labels, keyboard navigation, color contrast check).
+- [x] Write unit tests for budget calculation logic and JSON parsing fallback.
+- [x] Optimize bundle size (< 10 MB repo size enforcement).
 
 ## Phase 5: Documentation & Deployment
-- [ ] Write comprehensive `README.md` covering architecture, approach, and assumptions.
-- [ ] Host application on Vercel/Firebase.
-- [ ] Verify single branch `main` status on public GitHub repository.
+- [x] Write comprehensive `README.md` covering architecture, approach, and assumptions.
+- [x] Host application on Vercel/Firebase.
+- [x] Verify single branch `main` status on public GitHub repository.

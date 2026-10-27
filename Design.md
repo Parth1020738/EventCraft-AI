@@ -1,4 +1,4 @@
-﻿# Design System & Styling Guidelines
+# Design System & Styling Guidelines
 
 ## Color Palette
 - **Primary / Festive Accent:** Deep Indigo (`#4F46E5`) & Royal Violet (`#7C3AED`)
