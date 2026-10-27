@@ -11,10 +11,10 @@
 - [x] Construct loading skeletons and error handling states.
 
 ## Phase 3: Interactive Event Dashboard
-- [ ] Build Budget Breakdown component with interactive category budget sliders.
-- [ ] Build Master Countdown & Interactive Timeline view.
-- [ ] Build Actionable Vendor Checklist with status toggles (To Do, In Progress, Completed).
-- [ ] Build Creative Theme & Idea Showcase cards.
+- [x] Build Budget Breakdown component with interactive category budget sliders.
+- [x] Build Master Countdown & Interactive Timeline view.
+- [x] Build Actionable Vendor Checklist with status toggles (To Do, In Progress, Completed).
+- [x] Build Creative Theme & Idea Showcase cards.
 
 ## Phase 4: Polish, Testing & Accessibility
 - [ ] Run Accessibility Audit (ARIA labels, keyboard navigation, color contrast check).

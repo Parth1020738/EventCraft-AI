@@ -4,21 +4,22 @@ import {
   Calendar, 
   DollarSign, 
   CheckCircle2, 
-  Circle,
   PartyPopper, 
-  Flame,
-  ArrowRight,
-  ShieldCheck,
-  Zap,
+  ShieldCheck, 
   PlusCircle,
-  RotateCcw,
-  Check,
-  Tag
+  Layers,
+  CheckSquare,
+  Clock,
+  Palette
 } from 'lucide-react';
 import { EventProvider, useEventContext } from './context/EventContext';
 import EventWizard from './components/forms/EventWizard';
 import LoadingSkeleton from './components/ui/LoadingSkeleton';
 import ErrorMessage from './components/ui/ErrorMessage';
+import BudgetBreakdown from './components/dashboard/BudgetBreakdown';
+import CountdownTimeline from './components/dashboard/CountdownTimeline';
+import VendorChecklist from './components/dashboard/VendorChecklist';
+import ThemeShowcase from './components/dashboard/ThemeShowcase';
 
 function MainAppContent() {
   const { 
@@ -28,15 +29,16 @@ function MainAppContent() {
     error, 
     generatePlan, 
     loadFallbackBlueprint, 
-    toggleTask, 
     resetPlan 
   } = useEventContext();
+
+  const [activeTab, setActiveTab] = useState('all');
 
   const handleWizardSubmit = async (formData) => {
     try {
       await generatePlan(formData);
     } catch {
-      // Error is captured in context
+      // Handled via context error state
     }
   };
 
@@ -65,7 +67,7 @@ function MainAppContent() {
                 EventCraft AI
               </span>
               <span className="hidden sm:inline-block ml-2 text-xs font-semibold px-2 py-0.5 rounded-full bg-indigo-50 text-indigo-700 border border-indigo-200">
-                Phase 2 Active
+                Interactive Dashboard
               </span>
             </div>
           </div>
@@ -132,7 +134,7 @@ function MainAppContent() {
           </div>
         )}
 
-        {/* Generated Plan Dashboard View */}
+        {/* Generated Plan: Complete Interactive Dashboard */}
         {!isLoading && !error && eventData && (
           <div className="space-y-8 animate-fade-in">
             {/* Event Hero Summary Banner */}
@@ -170,230 +172,55 @@ function MainAppContent() {
                   </div>
                 </div>
               </div>
-
-              {/* Color Palette Swatches */}
-              {Array.isArray(eventData.summary.colorPalette) && (
-                <div className="mt-6 pt-6 border-t border-white/10 flex items-center gap-2">
-                  <span className="text-xs text-slate-400 font-medium mr-2">Theme Palette:</span>
-                  {eventData.summary.colorPalette.map((hex, i) => (
-                    <div 
-                      key={i} 
-                      className="w-6 h-6 rounded-full border border-white/40 shadow-xs" 
-                      style={{ backgroundColor: hex }} 
-                      title={hex} 
-                    />
-                  ))}
-                </div>
-              )}
             </section>
 
-            {/* Core Plan Grid: Budget, Timeline, Checklist */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-              {/* Budget Allocations Card */}
-              <div className="bg-white rounded-3xl p-6 border border-slate-200/80 shadow-sm space-y-4">
-                <div className="flex items-center justify-between pb-3 border-b border-slate-100">
-                  <div className="flex items-center gap-2.5">
-                    <div className="w-9 h-9 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center">
-                      <DollarSign className="w-5 h-5" />
-                    </div>
-                    <div>
-                      <h2 className="font-bold text-slate-900 text-base">Budget Breakdown</h2>
-                      <span className="text-xs text-slate-500">Itemized categories</span>
-                    </div>
-                  </div>
-                  <span className="text-sm font-bold font-mono text-indigo-600">
-                    {currencySymbol}{eventData.budget.totalBudget.toLocaleString()}
-                  </span>
-                </div>
-
-                <div className="space-y-3">
-                  {eventData.budget.allocations.map((alloc, idx) => (
-                    <div key={idx} className="space-y-1.5 p-3 rounded-2xl bg-slate-50/80 border border-slate-100">
-                      <div className="flex items-center justify-between text-xs">
-                        <span className="font-semibold text-slate-800">{alloc.category}</span>
-                        <span className="font-mono font-bold text-slate-900">
-                          {currencySymbol}{alloc.allocatedAmount.toLocaleString()} ({alloc.percentage}%)
-                        </span>
-                      </div>
-                      <div className="w-full bg-slate-200 rounded-full h-1.5 overflow-hidden">
-                        <div 
-                          className="bg-indigo-600 h-1.5 rounded-full transition-all" 
-                          style={{ width: `${alloc.percentage}%` }}
-                        />
-                      </div>
-                      <p className="text-[11px] text-slate-500 leading-tight pt-0.5">{alloc.notes}</p>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Master Timeline Card */}
-              <div className="bg-white rounded-3xl p-6 border border-slate-200/80 shadow-sm space-y-4">
-                <div className="flex items-center gap-2.5 pb-3 border-b border-slate-100">
-                  <div className="w-9 h-9 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center">
-                    <Calendar className="w-5 h-5" />
-                  </div>
-                  <div>
-                    <h2 className="font-bold text-slate-900 text-base">Master Timeline</h2>
-                    <span className="text-xs text-slate-500">{eventData.timeline.phases.length} Phases Scheduled</span>
-                  </div>
-                </div>
-
-                <div className="space-y-4">
-                  {eventData.timeline.phases.map((phase, pIdx) => (
-                    <div key={pIdx} className="space-y-2">
-                      <div className="flex items-center justify-between">
-                        <span className="text-xs font-bold text-indigo-900 uppercase tracking-wide">
-                          {phase.phaseName}
-                        </span>
-                        <span className="text-[11px] font-semibold text-slate-500 px-2 py-0.5 rounded-md bg-slate-100">
-                          {phase.targetPeriod}
-                        </span>
-                      </div>
-
-                      <div className="space-y-2 pl-2 border-l-2 border-indigo-100">
-                        {phase.milestones.map((m, mIdx) => (
-                          <div key={mIdx} className="text-xs space-y-0.5">
-                            <div className="flex items-center justify-between font-semibold text-slate-800">
-                              <span>{m.title}</span>
-                              <span className="text-[10px] text-indigo-600 font-mono">{m.dueTime}</span>
-                            </div>
-                            <p className="text-[11px] text-slate-500">{m.description}</p>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Interactive Checklist Card */}
-              <div className="bg-white rounded-3xl p-6 border border-slate-200/80 shadow-sm space-y-4">
-                <div className="flex items-center justify-between pb-3 border-b border-slate-100">
-                  <div className="flex items-center gap-2.5">
-                    <div className="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
-                      <CheckCircle2 className="w-5 h-5" />
-                    </div>
-                    <div>
-                      <h2 className="font-bold text-slate-900 text-base">Vendor Checklist</h2>
-                      <span className="text-xs text-slate-500">Interactive task toggles</span>
-                    </div>
-                  </div>
-                  <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-100">
-                    {eventData.checklist.filter((t) => t.status === 'Completed').length} / {eventData.checklist.length} Done
-                  </span>
-                </div>
-
-                <div className="space-y-2 max-h-[460px] overflow-y-auto pr-1">
-                  {eventData.checklist.map((task) => {
-                    const isDone = task.status === 'Completed';
-                    const isInProgress = task.status === 'In Progress';
-                    return (
-                      <button
-                        key={task.id}
-                        type="button"
-                        onClick={() => toggleTask(task.id)}
-                        className={`w-full p-3 rounded-2xl border text-left transition-all flex items-start gap-3 ${
-                          isDone 
-                            ? 'bg-slate-50/60 border-slate-200/60 opacity-70' 
-                            : isInProgress
-                            ? 'bg-indigo-50/50 border-indigo-200'
-                            : 'bg-white border-slate-200 hover:border-slate-300'
-                        } focus-visible:outline-2 focus-visible:outline-indigo-600`}
-                      >
-                        <div className="mt-0.5 shrink-0">
-                          {isDone ? (
-                            <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-                          ) : isInProgress ? (
-                            <div className="w-4 h-4 rounded-full border-2 border-indigo-600 border-t-transparent animate-spin" />
-                          ) : (
-                            <Circle className="w-4 h-4 text-slate-400" />
-                          )}
-                        </div>
-                        <div className="flex-1 text-xs space-y-1">
-                          <span className={`font-semibold block ${isDone ? 'line-through text-slate-500' : 'text-slate-800'}`}>
-                            {task.task}
-                          </span>
-                          <div className="flex items-center gap-2 text-[10px] text-slate-500">
-                            <span className="px-1.5 py-0.5 rounded bg-slate-100">{task.category}</span>
-                            <span>•</span>
-                            <span className={`font-semibold ${
-                              task.priority === 'High' ? 'text-rose-600' : task.priority === 'Medium' ? 'text-amber-600' : 'text-slate-600'
-                            }`}>
-                              {task.priority} Priority
-                            </span>
-                            <span>•</span>
-                            <span className="font-mono">{currencySymbol}{task.estimatedCost.toLocaleString()}</span>
-                          </div>
-                        </div>
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
+            {/* Dashboard View Tabs */}
+            <div className="flex items-center gap-2 border-b border-slate-200 pb-3 overflow-x-auto">
+              {[
+                { id: 'all', label: 'Overview & All Sections', icon: Layers },
+                { id: 'budget', label: 'Budget Sliders', icon: DollarSign },
+                { id: 'timeline', label: 'Master Itinerary', icon: Clock },
+                { id: 'checklist', label: 'Vendor Checklist', icon: CheckSquare },
+                { id: 'concepts', label: 'Themes & Ideas', icon: Palette },
+              ].map((tab) => {
+                const Icon = tab.icon;
+                const isActive = activeTab === tab.id;
+                return (
+                  <button
+                    key={tab.id}
+                    type="button"
+                    onClick={() => setActiveTab(tab.id)}
+                    className={`inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition-all ${
+                      isActive
+                        ? 'bg-indigo-600 text-white shadow-xs'
+                        : 'bg-white hover:bg-slate-100 text-slate-600 border border-slate-200/80'
+                    } focus-visible:outline-2 focus-visible:outline-indigo-600`}
+                  >
+                    <Icon className="w-3.5 h-3.5" />
+                    {tab.label}
+                  </button>
+                );
+              })}
             </div>
 
-            {/* Creative Ideas & Concepts Row */}
-            {eventData.creativeIdeas && (
-              <section className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/80 shadow-sm space-y-4">
-                <div className="flex items-center gap-2">
-                  <Sparkles className="w-5 h-5 text-indigo-600" />
-                  <h2 className="text-xl font-bold font-heading text-slate-900">
-                    Bespoke Creative Concepts & Entertainment
-                  </h2>
-                </div>
+            {/* Interactive Dashboard Sections */}
+            <div className="space-y-8">
+              {(activeTab === 'all' || activeTab === 'budget') && (
+                <BudgetBreakdown currencySymbol={currencySymbol} />
+              )}
 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-2">
-                  {/* Themes */}
-                  <div className="p-4 rounded-2xl bg-indigo-50/60 border border-indigo-100/80 space-y-2">
-                    <h3 className="font-bold text-xs uppercase tracking-wider text-indigo-900 flex items-center gap-1.5">
-                      <Tag className="w-3.5 h-3.5 text-indigo-600" />
-                      Theme Accents
-                    </h3>
-                    <ul className="space-y-1.5 text-xs text-slate-700">
-                      {eventData.creativeIdeas.themeSuggestions?.map((item, idx) => (
-                        <li key={idx} className="flex items-start gap-1.5">
-                          <span className="text-indigo-500">•</span>
-                          <span>{item}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
+              {(activeTab === 'all' || activeTab === 'timeline') && (
+                <CountdownTimeline />
+              )}
 
-                  {/* Decor Ideas */}
-                  <div className="p-4 rounded-2xl bg-amber-50/60 border border-amber-100/80 space-y-2">
-                    <h3 className="font-bold text-xs uppercase tracking-wider text-amber-900 flex items-center gap-1.5">
-                      <Flame className="w-3.5 h-3.5 text-amber-600" />
-                      Decor & Ambiance
-                    </h3>
-                    <ul className="space-y-1.5 text-xs text-slate-700">
-                      {eventData.creativeIdeas.decorIdeas?.map((item, idx) => (
-                        <li key={idx} className="flex items-start gap-1.5">
-                          <span className="text-amber-500">•</span>
-                          <span>{item}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
+              {(activeTab === 'all' || activeTab === 'checklist') && (
+                <VendorChecklist currencySymbol={currencySymbol} />
+              )}
 
-                  {/* Entertainment */}
-                  <div className="p-4 rounded-2xl bg-violet-50/60 border border-violet-100/80 space-y-2">
-                    <h3 className="font-bold text-xs uppercase tracking-wider text-violet-900 flex items-center gap-1.5">
-                      <PartyPopper className="w-3.5 h-3.5 text-violet-600" />
-                      Activities & Music
-                    </h3>
-                    <ul className="space-y-1.5 text-xs text-slate-700">
-                      {eventData.creativeIdeas.entertainmentSuggestions?.map((item, idx) => (
-                        <li key={idx} className="flex items-start gap-1.5">
-                          <span className="text-violet-500">•</span>
-                          <span>{item}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                </div>
-              </section>
-            )}
+              {(activeTab === 'all' || activeTab === 'concepts') && (
+                <ThemeShowcase />
+              )}
+            </div>
           </div>
         )}
       </main>
