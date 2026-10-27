@@ -40,11 +40,16 @@ Ensure timelines are logical and checklist items actionable. Output pure JSON on
 
     const prompt = `Generate a comprehensive, structured event plan with the following constraints:
 - Event Type: ${params.eventType || 'Celebration'}
-- Total Budget: ${params.budget || 5000} USD
+- Total Budget: ${params.budget || 5000} ${params.currency || 'USD'}
 - Guest Count: ${params.guestCount || 50} guests
 - Location Type: ${params.locationType || 'Indoor / Flexible'}
 - Target Date: ${params.targetDate || 'Upcoming in 3 months'}
+- Desired Experience & Atmosphere: ${params.desiredExperience || 'Intimate & Heartfelt'}
 - Theme / Preferences: ${params.theme || 'Elegant and memorable'}
+- Non-Negotiable Must-Haves: ${Array.isArray(params.mustHaves) ? params.mustHaves.join(', ') : 'Professional Photography'}
+- Accessibility & Dietary Needs: ${Array.isArray(params.accessibility) ? params.accessibility.join(', ') : 'Wheelchair / Step-Free Access'}
+- Cultural Customs: ${Array.isArray(params.culturalPreferences) ? params.culturalPreferences.join(', ') : 'Traditional Ceremonial Rituals'}
+- Special Notes: ${params.notes || 'None'}
 
 The JSON output MUST adhere strictly to this schema:
 {
@@ -161,6 +166,16 @@ export function getFallbackEventPlan(params = {}) {
   const guests = Number(params.guestCount) > 0 ? Number(params.guestCount) : 50;
   const location = params.locationType || 'Grand Banquet & Garden';
   const theme = params.theme || 'Royal Elegance & Warm Glow';
+  const experience = params.desiredExperience || 'Intimate & Heartfelt';
+  const mustHaves = Array.isArray(params.mustHaves) && params.mustHaves.length > 0
+    ? params.mustHaves.join(', ')
+    : 'Professional Photography, Interactive Photo Booth';
+  const accessibility = Array.isArray(params.accessibility) && params.accessibility.length > 0
+    ? params.accessibility.join(', ')
+    : 'Wheelchair / Step-Free Access';
+  const cultural = Array.isArray(params.culturalPreferences) && params.culturalPreferences.length > 0
+    ? params.culturalPreferences.join(', ')
+    : 'Traditional Ceremonial Rituals';
 
   const venueAmount = Math.round(total * 0.30);
   const cateringAmount = Math.round(total * 0.35);
@@ -173,7 +188,7 @@ export function getFallbackEventPlan(params = {}) {
       title: `${eventType} Spectacular`,
       eventType,
       theme,
-      description: `A thoughtfully orchestrated ${eventType.toLowerCase()} accommodating ${guests} guests at ${location}, designed around vibrant warmth, curated gastronomy, and unforgettable moments.`,
+      description: `A thoughtfully orchestrated ${eventType.toLowerCase()} accommodating ${guests} guests at ${location}. Curated for a ${experience.toLowerCase()} atmosphere with ${theme.toLowerCase()} styling. Prioritizing: ${mustHaves}. Honoring: ${cultural}. Inclusivity guaranteed via: ${accessibility}.`,
       estimatedGuests: guests,
       locationType: location,
       colorPalette: ['#4F46E5', '#7C3AED', '#F59E0B', '#FAFAFA'],

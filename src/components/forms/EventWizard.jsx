@@ -3,14 +3,8 @@ import {
   Sparkles, 
   ArrowRight, 
   ArrowLeft, 
-  Calendar, 
-  Users, 
-  DollarSign, 
-  MapPin, 
-  Palette, 
-  FileText,
-  CheckCircle2,
-  AlertCircle
+  AlertCircle,
+  Check
 } from 'lucide-react';
 import { validateStep1, validateStep2, validateStep3 } from '../../utils/validators';
 
@@ -35,6 +29,40 @@ const LOCATION_TYPES = [
   { id: 'Hybrid', label: 'Hybrid Space', desc: 'Indoor dining + outdoor patio' },
 ];
 
+const DESIRED_EXPERIENCES = [
+  { id: 'Intimate & Heartfelt', label: 'Intimate & Heartfelt', desc: 'Close warmth & emotional connection' },
+  { id: 'High-Energy & Vibrant', label: 'High-Energy & Vibrant', desc: 'Party vibe & nonstop dance floor' },
+  { id: 'Luxury & Prestigious', label: 'Luxury & Formal', desc: 'Black-tie elegance & elite gastronomy' },
+  { id: 'Casual & Festive', label: 'Casual & Festive', desc: 'Relaxed mingling & effortless hospitality' },
+  { id: 'Artistic & Bohemian', label: 'Artistic & Bohemian', desc: 'Creative flair & eclectic styling' },
+];
+
+const MUST_HAVES_OPTIONS = [
+  'Professional Photography',
+  'Open Bar & Signature Mixology',
+  'Live Band or High-Energy DJ',
+  'Drone Videography',
+  'Interactive Photo Booth',
+  'Multi-Tier Custom Cake',
+  'Late-Night Gourmet Snack Station',
+];
+
+const ACCESSIBILITY_OPTIONS = [
+  'Wheelchair / Step-Free Access',
+  'Vegan & Celiac-Friendly Catering',
+  'Quiet Sensory / Decompression Zone',
+  'Elderly-Friendly Ergonomic Seating',
+  'Halal / Kosher Certified Kitchen',
+];
+
+const CULTURAL_PREFERENCES_OPTIONS = [
+  'Traditional Ceremonial Rituals',
+  'Bilingual MC / Announcements',
+  'Multi-Faith Inclusivity',
+  'Custom Heritage Decor Accents',
+  'Traditional Music & Dance Welcome',
+];
+
 const THEME_PRESETS = [
   'Royal Elegance & Warm Glow',
   'Rustic Botanical & Fairy Lights',
@@ -56,7 +84,11 @@ export default function EventWizard({ onSubmit, isSubmitting }) {
     budget: 8000,
     currency: 'USD',
     locationType: 'Indoor',
+    desiredExperience: 'Intimate & Heartfelt',
     theme: 'Royal Elegance & Warm Glow',
+    mustHaves: ['Professional Photography', 'Interactive Photo Booth'],
+    accessibility: ['Wheelchair / Step-Free Access'],
+    culturalPreferences: ['Traditional Ceremonial Rituals'],
     notes: '',
   });
 
@@ -71,6 +103,16 @@ export default function EventWizard({ onSubmit, isSubmitting }) {
         return next;
       });
     }
+  };
+
+  const toggleArrayOption = (field, option) => {
+    setFormData((prev) => {
+      const current = prev[field] || [];
+      const updated = current.includes(option)
+        ? current.filter((item) => item !== option)
+        : [...current, option];
+      return { ...prev, [field]: updated };
+    });
   };
 
   const handleNext = () => {
@@ -367,7 +409,40 @@ export default function EventWizard({ onSubmit, isSubmitting }) {
         {/* ================= STEP 3: THEMES & PREFERENCES ================= */}
         {currentStep === 3 && (
           <div className="space-y-6 animate-fade-in">
-            {/* Theme Suggestions & Custom Input */}
+            {/* 1. Desired Experience / Atmosphere */}
+            <div className="space-y-2">
+              <label id="desired-experience-label" className="block text-sm font-semibold text-slate-800">
+                Desired Experience & Atmosphere <span className="text-rose-500">*</span>
+              </label>
+              <div
+                role="radiogroup"
+                aria-labelledby="desired-experience-label"
+                className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2.5"
+              >
+                {DESIRED_EXPERIENCES.map((exp) => {
+                  const selected = formData.desiredExperience === exp.id;
+                  return (
+                    <button
+                      key={exp.id}
+                      type="button"
+                      role="radio"
+                      aria-checked={selected}
+                      onClick={() => updateField('desiredExperience', exp.id)}
+                      className={`p-3 rounded-2xl border text-left transition-all ${
+                        selected
+                          ? 'border-indigo-600 bg-indigo-50/70 ring-2 ring-indigo-500/20'
+                          : 'border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50'
+                      } focus-visible:outline-2 focus-visible:outline-indigo-600`}
+                    >
+                      <span className="font-semibold text-xs text-slate-900 block">{exp.label}</span>
+                      <span className="text-[11px] text-slate-500 mt-0.5 block leading-tight">{exp.desc}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* 2. Theme Suggestions & Custom Input */}
             <div className="space-y-2">
               <label htmlFor="theme-input" className="block text-sm font-semibold text-slate-800">
                 Creative Theme & Vibe
@@ -407,10 +482,106 @@ export default function EventWizard({ onSubmit, isSubmitting }) {
               )}
             </div>
 
-            {/* Special Instructions / Notes */}
+            {/* 3. Non-Negotiable Must-Haves */}
+            <div className="space-y-2">
+              <label id="must-haves-label" className="block text-sm font-semibold text-slate-800">
+                Non-Negotiable Must-Haves <span className="text-xs text-slate-400 font-normal">(Select all that apply)</span>
+              </label>
+              <div
+                role="group"
+                aria-labelledby="must-haves-label"
+                className="flex flex-wrap gap-2"
+              >
+                {MUST_HAVES_OPTIONS.map((item) => {
+                  const isChecked = (formData.mustHaves || []).includes(item);
+                  return (
+                    <button
+                      key={item}
+                      type="button"
+                      aria-pressed={isChecked}
+                      onClick={() => toggleArrayOption('mustHaves', item)}
+                      className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-all ${
+                        isChecked
+                          ? 'bg-indigo-600 text-white shadow-xs ring-2 ring-indigo-500/20'
+                          : 'bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200/60'
+                      } focus-visible:outline-2 focus-visible:outline-indigo-600`}
+                    >
+                      {isChecked && <Check className="w-3.5 h-3.5 text-white" />}
+                      {item}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* 4. Accessibility & Dietary Inclusivity */}
+            <div className="space-y-2">
+              <label id="accessibility-label" className="block text-sm font-semibold text-slate-800">
+                Accessibility & Dietary Accommodations
+              </label>
+              <div
+                role="group"
+                aria-labelledby="accessibility-label"
+                className="flex flex-wrap gap-2"
+              >
+                {ACCESSIBILITY_OPTIONS.map((item) => {
+                  const isChecked = (formData.accessibility || []).includes(item);
+                  return (
+                    <button
+                      key={item}
+                      type="button"
+                      aria-pressed={isChecked}
+                      onClick={() => toggleArrayOption('accessibility', item)}
+                      className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-all ${
+                        isChecked
+                          ? 'bg-emerald-600 text-white shadow-xs ring-2 ring-emerald-500/20'
+                          : 'bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200/60'
+                      } focus-visible:outline-2 focus-visible:outline-emerald-600`}
+                    >
+                      {isChecked && <Check className="w-3.5 h-3.5 text-white" />}
+                      {item}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* 5. Cultural & Traditional Preferences */}
+            <div className="space-y-2">
+              <label id="cultural-label" className="block text-sm font-semibold text-slate-800">
+                Cultural & Traditional Customs
+              </label>
+              <div
+                role="group"
+                aria-labelledby="cultural-label"
+                className="flex flex-wrap gap-2"
+              >
+                {CULTURAL_PREFERENCES_OPTIONS.map((item) => {
+                  const isChecked = (formData.culturalPreferences || []).includes(item);
+                  return (
+                    <button
+                      key={item}
+                      type="button"
+                      aria-pressed={isChecked}
+                      onClick={() => toggleArrayOption('culturalPreferences', item)}
+                      className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-all ${
+                        isChecked
+                          ? 'bg-violet-600 text-white shadow-xs ring-2 ring-violet-500/20'
+                          : 'bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200/60'
+                      } focus-visible:outline-2 focus-visible:outline-violet-600`}
+                    >
+                      {isChecked && <Check className="w-3.5 h-3.5 text-white" />}
+                      {item}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* 6. Special Instructions / Notes */}
             <div className="space-y-1.5">
               <label htmlFor="notes-textarea" className="block text-sm font-semibold text-slate-800">
-                Special Requirements & Dietary Notes <span className="text-xs text-slate-400 font-normal">(Optional)</span>
+                Special Requirements & Notes <span className="text-xs text-slate-400 font-normal">(Optional)</span>
               </label>
               <textarea
                 id="notes-textarea"

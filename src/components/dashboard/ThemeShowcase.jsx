@@ -9,7 +9,7 @@ import {
   PartyPopper, 
   Flame, 
   MessageSquareQuote,
-  Share2
+  Tag
 } from 'lucide-react';
 import { useEventContext } from '../../context/EventContext';
 
@@ -110,6 +110,7 @@ export default function ThemeShowcase() {
             <button
               key={idx}
               type="button"
+              aria-label={`Copy color code ${hex}`}
               onClick={() => handleCopyHex(hex)}
               className="p-3 rounded-xl bg-white border border-slate-200 hover:border-indigo-400 transition-all flex items-center gap-3 text-left shadow-xs focus-visible:outline-2 focus-visible:outline-indigo-600"
             >
@@ -125,6 +126,23 @@ export default function ThemeShowcase() {
           ))}
         </div>
       </div>
+
+      {/* Theme Suggestions Banner */}
+      {themeSuggestions && themeSuggestions.length > 0 && (
+        <div className="p-4 rounded-2xl bg-slate-50/80 border border-slate-100 space-y-2">
+          <h3 className="text-xs font-bold uppercase tracking-wider text-slate-700 flex items-center gap-2">
+            <Tag className="w-3.5 h-3.5 text-indigo-600" />
+            Curated Theme Direction & Aesthetic Variations
+          </h3>
+          <div className="flex flex-wrap gap-2">
+            {themeSuggestions.map((theme, idx) => (
+              <span key={idx} className="px-3 py-1.5 rounded-xl bg-white border border-slate-200 text-xs font-medium text-slate-800 shadow-xs">
+                ✨ {theme}
+              </span>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Creative Cards Grid: Phrasing, Decor, Entertainment */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -143,6 +161,7 @@ export default function ThemeShowcase() {
                 <div className="flex justify-end">
                   <button
                     type="button"
+                    aria-label={`Copy invitation quote: ${quote}`}
                     onClick={() => handleCopyText(quote, idx)}
                     className="inline-flex items-center gap-1 text-[11px] font-semibold text-indigo-600 hover:text-indigo-800 transition-colors"
                   >

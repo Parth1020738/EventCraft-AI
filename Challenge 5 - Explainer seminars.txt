@@ -1,0 +1,50 @@
+## Notes
+
+**Title:** Prompt Wars Virtual Challenge 5 — Celebrations & Event Planner (Explainer + Submissions/Credits/Q&A)
+
+## Challenge 5 program changes and what you must submit
+- The Challenge 5 explainer is tied to a new evaluation-tool change and a new **“video submission”** module on the dashboard.
+- Besides building and submitting your **GitHub** and **deployed link**, you also must submit a **video of the project**.
+- The video is evaluated to confirm the functionality was working (so evaluators can see it even if credits/iterations changed by the time of review).
+- Submissions are “dual submission” style: **GitHub repo link + deployment link + LinkedIn post + video**.
+
+## What PromptVerse Virtual is (and how GenAI fits)
+- PromptVerse Virtual is described as a **bi-weekly challenge-based hackathon** where participants build **applications using prompts** from the provided problem statements.
+- Each submission should include a **working prototype**, **GitHub repo link**, and the required **video** plus documentation of GenAI usage.
+- You are mandated to use **AI tooling** (but you can use any AI tool you are comfortable with; examples mentioned include tools/services like **Gemini** and others).
+- Your **LinkedIn post** should explain tool usage and prompt flow/architecture (prompt excerpts and screenshots are acceptable too).
+
+## Challenge 5 problem logic: event planning as interconnected decisions
+- The challenge theme is **“celebration and event planner”**, emphasizing that event planning is **not one single problem** but **many connected decisions**.
+- A generic AI list of ideas is treated as insufficient because event plans must fit **budget, guest count, venue constraints, timeline, and priorities**.
+- The explainer proposes an approach where the application asks practical questions first (occasion, budget, attendees, date/timing, desired experience type, “must-haves”) and then builds a plan from the answers.
+- The application should help users understand **trade-offs** when assumptions change (e.g., expenses rising by 20%).
+- It also stresses **transparency**: the app should avoid “inventing prices” and presenting them as confirmed costs when based on assumptions.
+
+## Planning features the app should support (before “execution”)
+- **Budget planning:** categorize major expense areas (venue, catering, decoration, photography, etc.) and show how changes affect remaining budget.
+- **Timeline generation and dependencies:** convert vague goals into a structured sequence of tasks prioritized by deadline, including task dependencies (example: settle venue/dates before finalizing other arrangements).
+- **Scenario updates:** when the user changes something (more guests, reduced budget, event happening earlier), the application should help revise the plan rather than restarting from scratch.
+- **Vendor coordination (not magic):** structure vendor needs, prepare questions, compare quotations against budget/requirements, and clarify what still needs verification.
+
+| Area | What the explainer emphasizes building |
+|---|---|
+| Personalization | Ask/listen/adapt to user preferences (atmosphere, age group, accessibility, cultural preferences, venue limitations) rather than assuming what users want |
+| Trade-offs | Help users choose what matters when constraints change (e.g., prioritize food vs decoration, guest experience vs costs) |
+| Vendors | Organize quotation comparison (what’s included, charges, guest coverage) and avoid claiming availability/confirmed pricing without checking |
+| Execution vs inspiration | Build an AI that helps the event actually happen (budgets, deadlines, dependencies, changes), not only “party ideas” |
+
+## Submissions rules, evaluation, and score logic (plus credits/swags)
+- **Evaluation parameters** mentioned include: **code quality, security, efficiency, testing, accessibility, and problem statement alignment**.
+- **Problem statement alignment and code quality** are described as the highest-impact parameters.
+- You can make **three submission attempts**, but only the **final submission attempt score** counts (not the best of three).
+- **Video submission requirements:** the video should be a **tour/walkthrough** showcasing the project’s functionalities across scenarios; it’s meant to show what was working.
+- The app must be a **webpage**: **no Android apps** / no native app; the described requirement is “only a webpage.”
+- **Prompt credits** are earned by **valid submissions** and **top-400 leaderboard placement**, plus factors like documentation and consistency streaks (as described).
+- Credits are redeemable for **swags**; rank-based credit amounts are given for top positions (e.g., rank 1 gets **5,000**, rank 2 gets **4,500**, rank 3 gets **4,000**).
+- Credits **expire on 1 January 2027** and can be accumulated across challenges; the program is described as having **eight challenges total**, and it closes on **31 December**.
+
+## Takeaway
+- Build **an event planning assistant** that goes beyond ideas: it should ask key questions, generate budgets and timelines, handle **trade-offs**, and update the plan when assumptions change.
+- Focus on **problem statement alignment + code quality**, and ensure your required **GitHub/deployment/LinkedIn/video** submissions clearly demonstrate working functionality.
+- Use **GenAI meaningfully** (personalization, decisions, transparency) and don’t rely on unsupported “magic” like confirmed vendor availability or invented prices.

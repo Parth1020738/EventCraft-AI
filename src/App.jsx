@@ -1,22 +1,24 @@
 import { useState } from 'react';
 import { 
   Sparkles, 
-  Calendar, 
-  DollarSign, 
-  CheckCircle2, 
   PartyPopper, 
   ShieldCheck, 
   PlusCircle,
   Layers,
   CheckSquare,
   Clock,
-  Palette
+  Palette,
+  DollarSign,
+  RefreshCw,
+  Scale
 } from 'lucide-react';
 import { EventProvider, useEventContext } from './context/EventContext';
 import EventWizard from './components/forms/EventWizard';
 import LoadingSkeleton from './components/ui/LoadingSkeleton';
 import ErrorMessage from './components/ui/ErrorMessage';
 import BudgetBreakdown from './components/dashboard/BudgetBreakdown';
+import ScenarioRecalculator from './components/dashboard/ScenarioRecalculator';
+import TradeOffAdvisor from './components/dashboard/TradeOffAdvisor';
 import CountdownTimeline from './components/dashboard/CountdownTimeline';
 import VendorChecklist from './components/dashboard/VendorChecklist';
 import ThemeShowcase from './components/dashboard/ThemeShowcase';
@@ -178,7 +180,9 @@ function MainAppContent() {
             <div className="flex items-center gap-2 border-b border-slate-200 pb-3 overflow-x-auto">
               {[
                 { id: 'all', label: 'Overview & All Sections', icon: Layers },
-                { id: 'budget', label: 'Budget Sliders', icon: DollarSign },
+                { id: 'budget', label: 'Budget Allocations', icon: DollarSign },
+                { id: 'scenarios', label: 'Scenario Recalculator', icon: RefreshCw },
+                { id: 'tradeoffs', label: 'Trade-Off Advisor', icon: Scale },
                 { id: 'timeline', label: 'Master Itinerary', icon: Clock },
                 { id: 'checklist', label: 'Vendor Checklist', icon: CheckSquare },
                 { id: 'concepts', label: 'Themes & Ideas', icon: Palette },
@@ -205,8 +209,16 @@ function MainAppContent() {
 
             {/* Interactive Dashboard Sections */}
             <div className="space-y-8">
+              {(activeTab === 'all' || activeTab === 'scenarios') && (
+                <ScenarioRecalculator currencySymbol={currencySymbol} />
+              )}
+
               {(activeTab === 'all' || activeTab === 'budget') && (
                 <BudgetBreakdown currencySymbol={currencySymbol} />
+              )}
+
+              {(activeTab === 'all' || activeTab === 'tradeoffs') && (
+                <TradeOffAdvisor />
               )}
 
               {(activeTab === 'all' || activeTab === 'timeline') && (

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Sparkles, Compass, CheckCircle2 } from 'lucide-react';
+import { Sparkles } from 'lucide-react';
 
 const GENERATION_STAGES = [
   'Synthesizing guest volume and venue acoustics...',

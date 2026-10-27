@@ -1,12 +1,8 @@
 import { useState } from 'react';
 import { 
   DollarSign, 
-  Sliders, 
-  RotateCcw, 
-  TrendingUp, 
-  AlertCircle, 
-  CheckCircle,
-  HelpCircle
+  HelpCircle,
+  AlertCircle
 } from 'lucide-react';
 import { useEventContext } from '../../context/EventContext';
 
@@ -65,6 +61,21 @@ export default function BudgetBreakdown({ currencySymbol = '$' }) {
             {currencySymbol}{totalBudget.toLocaleString()}
           </span>
         </div>
+      </div>
+
+      {/* Vendor Transparency Disclaimer */}
+      <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200/70 flex items-start sm:items-center justify-between gap-3 text-xs">
+        <div className="flex items-start sm:items-center gap-2 text-slate-600">
+          <AlertCircle className="w-4 h-4 text-amber-500 shrink-0 mt-0.5 sm:mt-0" />
+          <span>
+            <strong>Estimated Assumptions:</strong> Figures represent regional planning averages — verify against actual vendor quotes.
+          </span>
+        </div>
+        {eventData.summary?.estimatedGuests > 0 && (
+          <span className="font-mono text-xs font-bold text-slate-700 bg-white px-2.5 py-1 rounded-lg border border-slate-200 shadow-xs shrink-0">
+            ~{currencySymbol}{Math.round(totalBudget / eventData.summary.estimatedGuests)} / guest
+          </span>
+        )}
       </div>
 
       {/* Visual Multi-Segment Distribution Bar */}

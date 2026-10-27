@@ -1,6 +1,10 @@
 import { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { generateEventPlan, getFallbackEventPlan } from '../services/gemini';
-import { recalculateAllocations } from '../utils/budgetCalculator';
+import { 
+  recalculateAllocations, 
+  recalculateScenario, 
+  applyTradeOffStrategy 
+} from '../utils/budgetCalculator';
 
 const STORAGE_KEY = 'eventcraft_ai_event_plan';
 const FORM_DATA_KEY = 'eventcraft_ai_last_form_data';
@@ -125,6 +129,72 @@ export function EventProvider({ children }) {
   }, []);
 
   /**
+   * Recalculates plan dynamically when scenario changes (guest count or budget)
+   * without restarting from scratch.
+   * @param {Object} scenarioParams
+   * @param {number} [scenarioParams.budget]
+   * @param {number} [scenarioParams.guestCount]
+   * @param {string} [scenarioParams.targetDate]
+   */
+  const updateScenario = useCallback(({ budget, guestCount, targetDate }) => {
+    setEventData((prev) => {
+      if (!prev || !prev.budget) return prev;
+
+      const oldBudget = prev.budget.totalBudget;
+      const oldGuests = prev.summary?.estimatedGuests || 50;
+      const newBudget = budget !== undefined ? Number(budget) : oldBudget;
+      const newGuests = guestCount !== undefined ? Number(guestCount) : oldGuests;
+
+      const rebalancedAllocations = recalculateScenario(
+        prev.budget.allocations,
+        newBudget,
+        oldGuests,
+        newGuests
+      );
+
+      return {
+        ...prev,
+        summary: {
+          ...prev.summary,
+          estimatedGuests: newGuests,
+        },
+        budget: {
+          ...prev.budget,
+          totalBudget: newBudget,
+          allocations: rebalancedAllocations,
+        },
+      };
+    });
+
+    if (targetDate) {
+      setLastParams((prev) => ({
+        ...prev,
+        targetDate,
+      }));
+    }
+  }, []);
+
+  /**
+   * Applies strategic trade-off shifts to current budget allocations.
+   * @param {'GASTRONOMY_FOCUS' | 'MEDIA_FOCUS' | 'VENUE_FOCUS' | 'INFLATION_BUFFER'} strategy
+   */
+  const applyTradeOff = useCallback((strategy) => {
+    setEventData((prev) => {
+      if (!prev || !prev.budget || !Array.isArray(prev.budget.allocations)) return prev;
+
+      const adjustedAllocations = applyTradeOffStrategy(prev.budget.allocations, strategy);
+
+      return {
+        ...prev,
+        budget: {
+          ...prev.budget,
+          allocations: adjustedAllocations,
+        },
+      };
+    });
+  }, []);
+
+  /**
    * Toggles task status in the checklist between 'To Do' -> 'In Progress' -> 'Completed'.
    * @param {string} taskId
    */
@@ -166,6 +236,8 @@ export function EventProvider({ children }) {
     generatePlan,
     loadFallbackBlueprint,
     updateBudgetCategory,
+    updateScenario,
+    applyTradeOff,
     toggleTask,
     resetPlan,
   };

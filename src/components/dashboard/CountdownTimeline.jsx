@@ -3,10 +3,8 @@ import {
   Calendar, 
   Clock, 
   CheckCircle2, 
-  Circle, 
-  ChevronRight, 
-  Sparkles,
-  Flame
+  Circle,
+  Link2
 } from 'lucide-react';
 import { useEventContext } from '../../context/EventContext';
 
@@ -166,6 +164,7 @@ export default function CountdownTimeline() {
                   <button
                     key={mIdx}
                     type="button"
+                    aria-label={`Toggle milestone: ${milestone.title}. Status: ${isDone ? 'Completed' : 'Pending'}`}
                     onClick={() => toggleMilestone(key)}
                     className={`w-full text-left p-3.5 rounded-2xl border transition-all flex items-start gap-3 ${
                       isDone
@@ -192,6 +191,17 @@ export default function CountdownTimeline() {
                       <p className={`text-xs leading-relaxed ${isDone ? 'line-through text-slate-400' : 'text-slate-600'}`}>
                         {milestone.description}
                       </p>
+                      {/* Sequential Task Dependency Badge */}
+                      <div className="flex items-center gap-1.5 text-[10px] text-slate-500 pt-1 font-medium">
+                        <Link2 className="w-3 h-3 text-indigo-500 shrink-0" />
+                        <span>
+                          {pIdx === 0
+                            ? 'Root Prerequisite: Milestone initiates planning sequence'
+                            : pIdx === 1
+                            ? 'Depends on: Phase 1 Venue agreement & primary deposits settled'
+                            : 'Depends on: Phase 2 Headcount lock & menu tastings completed'}
+                        </span>
+                      </div>
                     </div>
                   </button>
                 );
