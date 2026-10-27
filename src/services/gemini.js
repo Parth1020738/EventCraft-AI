@@ -59,7 +59,7 @@ The JSON output MUST adhere strictly to this schema:
   },
   "budget": {
     "totalBudget": ${Number(params.budget) || 5000},
-    "currency": "USD",
+    "currency": "${params.currency || 'USD'}",
     "allocations": [
       {
         "category": "Venue & Facilities",
@@ -180,7 +180,7 @@ export function getFallbackEventPlan(params = {}) {
     },
     budget: {
       totalBudget: total,
-      currency: 'USD',
+      currency: params.currency || 'USD',
       allocations: [
         {
           category: 'Venue & Facilities',

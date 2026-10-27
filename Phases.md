@@ -6,9 +6,9 @@
 - [x] Setup Firebase config and Gemini API client wrapper.
 
 ## Phase 2: Core Form & GenAI Engine
-- [ ] Build multi-step Event Wizard Form with input validation.
-- [ ] Implement Gemini prompt pipeline requesting structured JSON (Budget, Timeline, Vendors, Ideas).
-- [ ] Construct loading skeletons and error handling states.
+- [x] Build multi-step Event Wizard Form with input validation.
+- [x] Implement Gemini prompt pipeline requesting structured JSON (Budget, Timeline, Vendors, Ideas).
+- [x] Construct loading skeletons and error handling states.
 
 ## Phase 3: Interactive Event Dashboard
 - [ ] Build Budget Breakdown component with interactive category budget sliders.
