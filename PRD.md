@@ -1,4 +1,4 @@
-﻿# Product Requirements Document (PRD)
+# Product Requirements Document (PRD)
 
 ## Project Title
 Celebration & Event Planner (GenAI-Powered)
