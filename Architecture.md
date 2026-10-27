@@ -1,4 +1,4 @@
-﻿# System Architecture & Technical Specification
+# System Architecture & Technical Specification
 
 ## Technical Stack
 - **Frontend Framework:** React 18+ (Vite)

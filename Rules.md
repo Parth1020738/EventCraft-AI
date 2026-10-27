@@ -1,4 +1,4 @@
-﻿# AI Development Boundaries & Rules
+# AI Development Boundaries & Rules
 
 ## General Constraints
 1. **Repository Size:** Strictly keep repository size < 10 MB. Never commit build outputs (`dist/`, `build/`), `.env`, or media assets.
