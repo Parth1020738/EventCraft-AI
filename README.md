@@ -154,19 +154,20 @@ Adhering to hackathon zero-downtime standards:
 
 ## 6. Automated Test Suite Results
 
-EventCraft AI features 37 comprehensive unit tests verifying data validation, financial calculations, scenario updates, trade-offs, and Gemini fail-safe fallbacks:
+EventCraft AI features 56 comprehensive unit tests across 5 test suites verifying data validation, financial calculations, exact balance invariance, state persistence, input sanitization, scenario updates, trade-offs, and Gemini fail-safe fallbacks:
 
 ```
  RUN  v4.1.12 EventCraft-AI
 
- ✓ src/utils/validators.test.js (17 tests)
- ✓ src/utils/budgetCalculator.test.js (18 tests)
+ ✓ src/utils/sanitizers.test.js (12 tests)
+ ✓ src/utils/budgetCalculator.test.js (19 tests)
  ✓ src/services/gemini.test.js (2 tests)
+ ✓ src/utils/validators.test.js (17 tests)
+ ✓ src/context/EventContext.test.jsx (6 tests)
 
- Test Files  3 passed (3)
-      Tests  37 passed (37)
-   Start at  19:25:54
-   Duration  2.29s (100% passing)
+ Test Files  5 passed (5)
+      Tests  56 passed (56)
+   Duration  2.74s (100% passing)
 ```
 
 ---
@@ -190,7 +191,7 @@ For PromptWars Virtual Challenge 05, I built EventCraft AI — an intelligent, G
 🔹 Vendor Transparency: Clear "Estimated Assumptions" labels and built-in "Vendor Verification Questions" for confident real-world quoting.
 🔹 Zero Downtime Architecture: Powered by Google Gemini 1.5 Flash structured JSON mode with deterministic offline fallback blueprints.
 
-Built with React 19, Tailwind CSS v4, and Google Gemini API. 100% WCAG 2.1 AA accessible and verified with 37 automated tests!
+Built with React 19, Tailwind CSS v4, and Google Gemini API. 100% WCAG 2.1 AA accessible and verified with 56 automated tests across 5 test suites!
 
 🔗 Live App: [Insert Deployed URL]
 💻 GitHub Repository: https://github.com/Parth1020738/EventCraft-AI
@@ -211,7 +212,7 @@ Huge thanks to the PromptWars team for an incredible challenge!
 | **0:45 - 1:45** | **8-Dimension Wizard & GenAI Engine** | Navigating Steps 1, 2, and 3 | *"Let's plan a milestone celebration. In Step 1, we select Wedding, our target date, and 75 guests. In Step 2, we set a $8,000 budget and choose an Indoor Banquet. In Step 3, we capture desired experience — Intimate & Heartfelt, Royal Elegance theme, select our Must-Haves like Professional Photography, and add Accessibility needs. Clicking Generate calls Google Gemini 1.5 Flash using structured JSON mode, with a deterministic fallback guaranteeing zero downtime."* |
 | **1:45 - 2:45** | **Dashboard, Sliders & Scenario Recalculator** | Overview tab, sliders, Scenario widget | *"Here is our comprehensive event plan. In the Budget Allocations tab, our interactive sliders dynamically rebalance funds. But what if our guest list surges to 105 attendees? Instead of restarting, our Dynamic Scenario Recalculator simulates the what-if: catering scales dynamically while fixed decor remains stable, seamlessly updating the live plan."* |
 | **2:45 - 3:30** | **Trade-Off Engine & Vendor Transparency** | Trade-Off Advisor tab, Vendor Checklist tab | *"Now, what if costs rise? Our Trade-Off Engine lets us apply strategies like 'Gastronomy Focus' or 'Inflation Buffer' with one click, maintaining 100% balance. Looking at our Vendor Checklist, notice our transparency disclaimer: all prices are explicitly labeled as Estimated Assumptions based on regional averages. Expanding each category reveals key verification questions to ask vendors during quoting."* |
-| **3:30 - 4:00** | **Timeline Dependencies, Testing & Conclusion** | Master Itinerary tab, terminal test view | *"Our Master Itinerary features a live countdown clock and sequential prerequisite chains ensuring venue lock precedes vendor booking. EventCraft AI is built with React 19, Tailwind CSS v4, achieves WCAG AA compliance, and passes 37 automated unit tests. Thank you for watching!"* |
+| **3:30 - 4:00** | **Timeline Dependencies, Testing & Conclusion** | Master Itinerary tab, terminal test view | *"Our Master Itinerary features a live countdown clock and sequential prerequisite chains ensuring venue lock precedes vendor booking. EventCraft AI is built with React 19, Tailwind CSS v4, achieves WCAG AA compliance, and passes 56 automated unit tests across 5 test suites. Thank you for watching!"* |
 
 ---
 
@@ -234,7 +235,7 @@ npm install
 cp .env.example .env.local
 # Add VITE_GEMINI_API_KEY if available (deterministic offline blueprint activates automatically if omitted)
 
-# 4. Run automated unit test suite (37 tests)
+# 4. Run automated unit test suite (56 tests across 5 suites)
 npm run test
 
 # 5. Build for production verification
