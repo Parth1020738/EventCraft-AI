@@ -40,3 +40,4 @@ export const VENDOR_VERIFICATION_QUESTIONS = {
 
 export const PRIORITY_FILTERS = ['ALL', 'High', 'Medium', 'Low'];
 export const STATUS_FILTERS = ['ALL', 'To Do', 'In Progress', 'Completed'];
+

@@ -122,3 +122,4 @@ export default function WizardStep1({ formData, updateField, errors, todayString
     </div>
   );
 }
+

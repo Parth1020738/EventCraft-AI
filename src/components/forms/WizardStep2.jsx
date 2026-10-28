@@ -102,3 +102,4 @@ export default function WizardStep2({ formData, updateField, errors }) {
     </div>
   );
 }
+

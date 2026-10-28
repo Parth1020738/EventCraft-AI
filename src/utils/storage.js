@@ -42,3 +42,4 @@ export function safeSetStorage(key, value) {
     console.warn(`Could not persist '${key}' to localStorage:`, err);
   }
 }
+

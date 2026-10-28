@@ -113,3 +113,4 @@ export default function AddTaskModal({ isOpen, onClose, onAddTask }) {
     </form>
   );
 }
+
