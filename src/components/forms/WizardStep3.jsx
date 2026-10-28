@@ -86,11 +86,13 @@ export default function WizardStep3({
           type="text"
           value={formData.theme}
           onChange={(e) => updateField('theme', e.target.value)}
+          aria-invalid={!!errors.theme}
+          aria-describedby={errors.theme ? 'theme-error' : undefined}
           placeholder="Or type a custom theme (e.g. Cyberpunk Neon Garden)"
           className="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-white text-sm text-slate-800 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 outline-none transition-all"
         />
         {errors.theme && (
-          <p className="text-xs text-rose-500 flex items-center gap-1">
+          <p id="theme-error" className="text-xs text-rose-500 flex items-center gap-1">
             <AlertCircle className="w-3.5 h-3.5" />
             {errors.theme}
           </p>
@@ -203,11 +205,13 @@ export default function WizardStep3({
           rows={3}
           value={formData.notes}
           onChange={(e) => updateField('notes', e.target.value)}
+          aria-invalid={!!errors.notes}
+          aria-describedby={errors.notes ? 'notes-error' : undefined}
           placeholder="e.g. Vegetarian catering focus, need live acoustic set, strict noise curfew at 10 PM."
           className="w-full px-4 py-2.5 rounded-xl border border-slate-200 bg-white text-sm text-slate-800 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 outline-none transition-all resize-none"
         />
         {errors.notes && (
-          <p className="text-xs text-rose-500 flex items-center gap-1">
+          <p id="notes-error" className="text-xs text-rose-500 flex items-center gap-1">
             <AlertCircle className="w-3.5 h-3.5" />
             {errors.notes}
           </p>

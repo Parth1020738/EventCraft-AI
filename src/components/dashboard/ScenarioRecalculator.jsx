@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { RefreshCw, Users, DollarSign, Calendar, TrendingUp, Check } from 'lucide-react';
 import { useEventContext } from '../../context/EventContext';
 
@@ -23,16 +23,26 @@ export default function ScenarioRecalculator({ currencySymbol = '$' }) {
   const [simDate, setSimDate] = useState(currentDate);
   const [appliedNotice, setAppliedNotice] = useState(false);
 
+  // Synchronize simulation baselines whenever live plan updates
+  useEffect(() => {
+    setSimGuests(currentGuests);
+    setSimBudget(currentBudget);
+  }, [currentGuests, currentBudget]);
+
+  useEffect(() => {
+    setSimDate(currentDate);
+  }, [currentDate]);
+
   const currentPerGuest = Math.round(currentBudget / Math.max(1, currentGuests));
-  const simPerGuest = Math.round(simBudget / Math.max(1, simGuests));
-  const guestDelta = simGuests - currentGuests;
-  const budgetDelta = simBudget - currentBudget;
+  const simPerGuest = Math.round((Number(simBudget) || currentBudget) / Math.max(1, Number(simGuests) || 1));
+  const guestDelta = (Number(simGuests) || currentGuests) - currentGuests;
+  const budgetDelta = (Number(simBudget) || currentBudget) - currentBudget;
 
   const handleApply = (e) => {
     e.preventDefault();
     updateScenario({
-      budget: simBudget,
-      guestCount: simGuests,
+      budget: Number(simBudget) || currentBudget,
+      guestCount: Number(simGuests) || currentGuests,
       targetDate: simDate,
     });
     setAppliedNotice(true);
@@ -84,7 +94,8 @@ export default function ScenarioRecalculator({ currencySymbol = '$' }) {
                 min="1"
                 max="50000"
                 value={simGuests}
-                onChange={(e) => setSimGuests(Math.max(1, Number(e.target.value)))}
+                onChange={(e) => setSimGuests(e.target.value === '' ? '' : Math.max(1, Math.min(50000, Number(e.target.value))))}
+                onBlur={() => setSimGuests((prev) => (prev === '' ? currentGuests : Math.max(1, Math.min(50000, Number(prev)))))}
                 className="w-full px-3 py-2 rounded-xl border border-slate-200 bg-white font-mono text-sm font-bold text-slate-900 outline-none focus:ring-2 focus:ring-indigo-100"
               />
             </div>
@@ -109,7 +120,8 @@ export default function ScenarioRecalculator({ currencySymbol = '$' }) {
                 min="100"
                 step="100"
                 value={simBudget}
-                onChange={(e) => setSimBudget(Math.max(100, Number(e.target.value)))}
+                onChange={(e) => setSimBudget(e.target.value === '' ? '' : Math.max(0, Number(e.target.value)))}
+                onBlur={() => setSimBudget((prev) => (prev === '' ? currentBudget : Math.max(100, Number(prev))))}
                 className="w-full px-3 py-2 rounded-xl border border-slate-200 bg-white font-mono text-sm font-bold text-slate-900 outline-none focus:ring-2 focus:ring-indigo-100"
               />
             </div>

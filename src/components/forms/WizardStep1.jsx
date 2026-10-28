@@ -104,6 +104,7 @@ export default function WizardStep1({ formData, updateField, errors, todayString
               <button
                 key={count}
                 type="button"
+                aria-label={`Set guest count to ${count}`}
                 onClick={() => updateField('guestCount', count)}
                 className="px-2 py-0.5 text-xs font-medium rounded-md bg-slate-100 hover:bg-slate-200 text-slate-600 transition-colors"
               >

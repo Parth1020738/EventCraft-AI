@@ -4,6 +4,15 @@
  * rate-limited, or running in an unconfigured offline environment.
  */
 
+export const DEFAULT_FALLBACK_PARAMS = {
+  eventType: 'Celebration',
+  budget: 5000,
+  currency: 'USD',
+  guestCount: 50,
+  locationType: 'Indoor / Flexible',
+  theme: 'Royal Elegance & Warm Glow',
+};
+
 /**
  * Generates a complete, structured event plan matching the Gemini schema.
  *
@@ -22,11 +31,11 @@
  * @returns {Object} Structured event plan conforming to dashboard specifications
  */
 export function getFallbackEventPlan(params = {}) {
-  const eventType = params.eventType || 'Celebration';
-  const total = Number(params.budget) > 0 ? Number(params.budget) : 5000;
-  const guests = Number(params.guestCount) > 0 ? Number(params.guestCount) : 50;
+  const eventType = params.eventType || DEFAULT_FALLBACK_PARAMS.eventType;
+  const total = Number(params.budget) > 0 ? Number(params.budget) : DEFAULT_FALLBACK_PARAMS.budget;
+  const guests = Number(params.guestCount) > 0 ? Number(params.guestCount) : DEFAULT_FALLBACK_PARAMS.guestCount;
   const location = params.locationType || 'Grand Banquet & Garden';
-  const theme = params.theme || 'Royal Elegance & Warm Glow';
+  const theme = params.theme || DEFAULT_FALLBACK_PARAMS.theme;
   const experience = params.desiredExperience || 'Intimate & Heartfelt';
   const mustHaves = Array.isArray(params.mustHaves) && params.mustHaves.length > 0
     ? params.mustHaves.join(', ')
@@ -238,4 +247,3 @@ export function getFallbackEventPlan(params = {}) {
     },
   };
 }
-

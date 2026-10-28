@@ -111,8 +111,13 @@ describe('Budget Calculator Logic Suite', () => {
     it('scales allocations proportionally when total budget increases without resetting plan', () => {
       const updated = recalculateScenario(sampleAllocations, 20000, 50, 50);
       const total = calculateTotalBudget(updated);
-      expect(total).toBeCloseTo(20000, -2);
+      expect(total).toBe(20000);
       expect(updated.length).toBe(sampleAllocations.length);
+    });
+
+    it('guarantees 100% exact mathematical budget sum balance after headcount shift', () => {
+      const updated = recalculateScenario(sampleAllocations, 13750, 60, 140);
+      expect(calculateTotalBudget(updated)).toBe(13750);
     });
 
     it('adjusts catering more aggressively when guest count doubles (guest sensitivity weighting)', () => {

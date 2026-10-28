@@ -138,9 +138,10 @@ export function recalculateScenario(allocations = [], newTotalBudget, oldGuests 
   });
 
   const totalRawShare = weightedList.reduce((sum, i) => sum + i.rawShare, 0);
+  if (totalRawShare <= 0) return allocations;
 
   // Re-normalize exact amounts to match the new total budget
-  return weightedList.map((item) => {
+  const rebalanced = weightedList.map((item) => {
     const normalizedPercent = Math.max(2, Math.round((item.rawShare / totalRawShare) * 100));
     const allocatedAmount = Math.round((item.rawShare / totalRawShare) * safeBudget);
     const { rawShare: _, ...cleanItem } = item;
@@ -150,6 +151,18 @@ export function recalculateScenario(allocations = [], newTotalBudget, oldGuests 
       percentage: normalizedPercent,
     };
   });
+
+  // Rebalance any rounding discrepancy so total equals safeBudget exactly
+  const rebalancedTotal = calculateTotalBudget(rebalanced);
+  const diff = safeBudget - rebalancedTotal;
+  if (diff !== 0 && rebalanced.length > 0) {
+    rebalanced[0].allocatedAmount += diff;
+  }
+
+  return rebalanced.map((item) => ({
+    ...item,
+    percentage: calculateCategoryPercentage(item.allocatedAmount, safeBudget),
+  }));
 }
 
 /**

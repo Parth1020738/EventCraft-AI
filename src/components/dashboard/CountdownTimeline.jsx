@@ -48,7 +48,11 @@ export default function CountdownTimeline() {
   const [timeLeft, setTimeLeft] = useState(() => calculateTimeRemaining(targetDateStr));
 
   useEffect(() => {
-    if (!targetDateStr) return;
+    if (!targetDateStr) {
+      setTimeLeft(null);
+      return;
+    }
+    setTimeLeft(calculateTimeRemaining(targetDateStr));
     const timer = setInterval(() => {
       setTimeLeft(calculateTimeRemaining(targetDateStr));
     }, 1000);

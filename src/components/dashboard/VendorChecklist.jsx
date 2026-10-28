@@ -1,24 +1,21 @@
 import { useState } from 'react';
-import { 
-  CheckCircle2, 
-  Plus, 
-  Search,
-  AlertTriangle
-} from 'lucide-react';
+import { CheckCircle2, Plus, Search } from 'lucide-react';
 import { useEventContext } from '../../context/EventContext';
 import { PRIORITY_FILTERS, STATUS_FILTERS } from './vendorConstants';
 import AddTaskModal from './AddTaskModal';
 import VendorTaskCard from './VendorTaskCard';
+import DisclaimerBanner from '../common/DisclaimerBanner';
 
 /**
  * Actionable, categorized vendor & tasks checklist with priority filters, search,
  * transparent estimation labels, and vendor verification quoting questions.
  *
  * @param {Object} props
- * @param {string} props.currencySymbol - e.g. '$', '₹', '€', '£'
+ * @param {string} [props.currencySymbol='$'] - Active currency symbol
+ * @returns {import('react').JSX.Element|null}
  */
 export default function VendorChecklist({ currencySymbol = '$' }) {
-  const { eventData, toggleTask } = useEventContext();
+  const { eventData, toggleTask, addTask } = useEventContext();
   const [filterPriority, setFilterPriority] = useState('ALL');
   const [filterStatus, setFilterStatus] = useState('ALL');
   const [searchQuery, setSearchQuery] = useState('');
@@ -43,7 +40,11 @@ export default function VendorChecklist({ currencySymbol = '$' }) {
   const completionPercentage = checklist.length > 0 ? Math.round((completedCount / checklist.length) * 100) : 0;
 
   const handleAddNewTask = (newTask) => {
-    checklist.push(newTask);
+    if (typeof addTask === 'function') {
+      addTask(newTask);
+    } else {
+      checklist.push(newTask);
+    }
   };
 
   const toggleQuestions = (e, taskId) => {
@@ -80,15 +81,11 @@ export default function VendorChecklist({ currencySymbol = '$' }) {
       </div>
 
       {/* Transparency Disclaimer Notice */}
-      <div className="p-3.5 rounded-2xl bg-amber-50/70 border border-amber-200/80 flex items-start gap-2.5 text-xs text-amber-900">
-        <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
-        <div className="space-y-0.5 leading-relaxed">
-          <span className="font-bold">Vendor Transparency Disclaimer:</span>
-          <p className="text-amber-800 text-[11px]">
-            All pricing figures shown represent <strong>Estimated Assumptions</strong> based on regional averages — not claimed confirmed quotes. Use our vendor verification questions below to obtain exact real-world bids.
-          </p>
-        </div>
-      </div>
+      <DisclaimerBanner
+        variant="amber"
+        title="Vendor Transparency Disclaimer:"
+        message="All pricing figures shown represent Estimated Assumptions based on regional averages — not claimed confirmed quotes. Use our vendor verification questions below to obtain exact real-world bids."
+      />
 
       {/* Completion Progress Bar */}
       <div className="p-4 rounded-2xl bg-slate-50 border border-slate-100 space-y-2">

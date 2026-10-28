@@ -1,10 +1,7 @@
 import { useState } from 'react';
-import { 
-  DollarSign, 
-  HelpCircle, 
-  AlertCircle 
-} from 'lucide-react';
+import { DollarSign, HelpCircle } from 'lucide-react';
 import { useEventContext } from '../../context/EventContext';
+import DisclaimerBanner from '../common/DisclaimerBanner';
 
 /**
  * Aesthetic styling definitions for budget breakdown categories.
@@ -33,6 +30,9 @@ export default function BudgetBreakdown({ currencySymbol = '$' }) {
 
   const { totalBudget, allocations } = eventData.budget;
   const maxSliderValue = Math.max(10000, totalBudget * 1.5);
+  const perGuestCost = eventData.summary?.estimatedGuests > 0
+    ? `${currencySymbol}${Math.round(totalBudget / eventData.summary.estimatedGuests)} / guest`
+    : null;
 
   const handleSliderChange = (category, value) => {
     updateBudgetCategory(category, Number(value));
@@ -67,20 +67,13 @@ export default function BudgetBreakdown({ currencySymbol = '$' }) {
         </div>
       </div>
 
-      {/* Vendor Transparency Disclaimer */}
-      <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200/70 flex items-start sm:items-center justify-between gap-3 text-xs">
-        <div className="flex items-start sm:items-center gap-2 text-slate-600">
-          <AlertCircle className="w-4 h-4 text-amber-500 shrink-0 mt-0.5 sm:mt-0" />
-          <span>
-            <strong>Estimated Assumptions:</strong> Figures represent regional planning averages — verify against actual vendor quotes.
-          </span>
-        </div>
-        {eventData.summary?.estimatedGuests > 0 && (
-          <span className="font-mono text-xs font-bold text-slate-700 bg-white px-2.5 py-1 rounded-lg border border-slate-200 shadow-xs shrink-0">
-            ~{currencySymbol}{Math.round(totalBudget / eventData.summary.estimatedGuests)} / guest
-          </span>
-        )}
-      </div>
+      {/* Vendor Transparency Disclaimer Notice */}
+      <DisclaimerBanner
+        variant="slate"
+        title="Estimated Assumptions:"
+        message="Figures represent regional planning averages — verify against actual vendor quotes."
+        perGuestCost={perGuestCost}
+      />
 
       {/* Visual Multi-Segment Distribution Bar */}
       <div className="space-y-2">
@@ -138,7 +131,7 @@ export default function BudgetBreakdown({ currencySymbol = '$' }) {
                 </div>
               </div>
 
-              {/* Slider Input */}
+              {/* Slider Input with Full ARIA Accessibility */}
               <div className="flex items-center gap-4">
                 <label htmlFor={`slider-${idx}`} className="sr-only">
                   Adjust {item.category} budget
@@ -150,6 +143,10 @@ export default function BudgetBreakdown({ currencySymbol = '$' }) {
                   max={maxSliderValue}
                   step="50"
                   value={item.allocatedAmount}
+                  aria-valuemin={0}
+                  aria-valuemax={maxSliderValue}
+                  aria-valuenow={item.allocatedAmount}
+                  aria-valuetext={`${currencySymbol}${item.allocatedAmount.toLocaleString()}`}
                   onChange={(e) => handleSliderChange(item.category, e.target.value)}
                   className="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-indigo-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500"
                 />

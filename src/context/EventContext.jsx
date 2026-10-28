@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { generateEventPlan, getFallbackEventPlan } from '../services/gemini';
+import { DEFAULT_FALLBACK_PARAMS } from '../services/fallbackPlan';
 import { 
   recalculateAllocations, 
   recalculateScenario, 
@@ -12,14 +13,11 @@ import {
   FORM_DATA_STORAGE_KEY
 } from '../utils/storage';
 
-/**
- * React Context for EventCraft AI global state management.
- */
 const EventContext = createContext(null);
 
 /**
- * EventProvider component wrapping the application to supply global event state,
- * generator triggers, interactive budget rebalancing, and local persistence.
+ * EventProvider component supplying global event state, generator triggers,
+ * scenario recalculations, trade-off shifts, and task management.
  *
  * @param {Object} props
  * @param {import('react').ReactNode} props.children - Child elements
@@ -31,12 +29,10 @@ export function EventProvider({ children }) {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  // Sync eventData changes to localStorage
   useEffect(() => {
     safeSetStorage(EVENT_PLAN_STORAGE_KEY, eventData);
   }, [eventData]);
 
-  // Sync lastParams changes to localStorage
   useEffect(() => {
     safeSetStorage(FORM_DATA_STORAGE_KEY, lastParams);
   }, [lastParams]);
@@ -44,7 +40,6 @@ export function EventProvider({ children }) {
   /**
    * Generates a new plan via Gemini AI or deterministic fallback.
    * @param {Object} formData - User onboarding specifications
-   * @returns {Promise<Object>} Generated plan blueprint
    */
   const generatePlan = useCallback(async (formData) => {
     setIsLoading(true);
@@ -70,19 +65,11 @@ export function EventProvider({ children }) {
   /**
    * Fail-safe helper: Load fallback blueprint immediately on request.
    * @param {Object} [customParams] - Optional parameters to override defaults
-   * @returns {Object} Deterministic fallback blueprint
    */
   const loadFallbackBlueprint = useCallback((customParams) => {
     setIsLoading(false);
     setError(null);
-    const params = customParams || lastParams || {
-      eventType: 'Celebration',
-      budget: 5000,
-      currency: 'USD',
-      guestCount: 50,
-      locationType: 'Indoor / Flexible',
-      theme: 'Vibrant Celebration',
-    };
+    const params = customParams || lastParams || DEFAULT_FALLBACK_PARAMS;
     const fallback = getFallbackEventPlan(params);
     setEventData(fallback);
     return fallback;
@@ -90,12 +77,10 @@ export function EventProvider({ children }) {
 
   /**
    * Updates an itemized budget category amount and recalibrates total and percentages.
-   * @param {string} categoryName - Category to adjust
-   * @param {number} newAmount - New monetary amount
    */
   const updateBudgetCategory = useCallback((categoryName, newAmount) => {
     setEventData((prev) => {
-      if (!prev || !prev.budget || !Array.isArray(prev.budget.allocations)) return prev;
+      if (!prev?.budget?.allocations) return prev;
 
       const { allocations: normalizedAllocations, totalBudget: newTotal } = recalculateAllocations(
         prev.budget.allocations,
@@ -115,16 +100,11 @@ export function EventProvider({ children }) {
   }, []);
 
   /**
-   * Recalculates plan dynamically when scenario changes (guest count or budget)
-   * without restarting from scratch.
-   * @param {Object} scenarioParams - Scenario adjustment parameters
-   * @param {number} [scenarioParams.budget] - Updated total budget
-   * @param {number} [scenarioParams.guestCount] - Updated headcount
-   * @param {string} [scenarioParams.targetDate] - Updated target date
+   * Recalculates plan dynamically when scenario changes without restarting.
    */
   const updateScenario = useCallback(({ budget, guestCount, targetDate }) => {
     setEventData((prev) => {
-      if (!prev || !prev.budget) return prev;
+      if (!prev?.budget) return prev;
 
       const oldBudget = prev.budget.totalBudget;
       const oldGuests = prev.summary?.estimatedGuests || 50;
@@ -153,23 +133,17 @@ export function EventProvider({ children }) {
     });
 
     if (targetDate) {
-      setLastParams((prev) => ({
-        ...prev,
-        targetDate,
-      }));
+      setLastParams((prev) => ({ ...prev, targetDate }));
     }
   }, []);
 
   /**
    * Applies strategic trade-off shifts to current budget allocations.
-   * @param {'GASTRONOMY_FOCUS' | 'MEDIA_FOCUS' | 'VENUE_FOCUS' | 'INFLATION_BUFFER'} strategy
    */
   const applyTradeOff = useCallback((strategy) => {
     setEventData((prev) => {
-      if (!prev || !prev.budget || !Array.isArray(prev.budget.allocations)) return prev;
-
+      if (!prev?.budget?.allocations) return prev;
       const adjustedAllocations = applyTradeOffStrategy(prev.budget.allocations, strategy);
-
       return {
         ...prev,
         budget: {
@@ -182,11 +156,10 @@ export function EventProvider({ children }) {
 
   /**
    * Toggles task status in the checklist between 'To Do' -> 'In Progress' -> 'Completed'.
-   * @param {string} taskId - Unique task identifier
    */
   const toggleTask = useCallback((taskId) => {
     setEventData((prev) => {
-      if (!prev || !Array.isArray(prev.checklist)) return prev;
+      if (!Array.isArray(prev?.checklist)) return prev;
 
       const updatedChecklist = prev.checklist.map((item) => {
         if (item.id === taskId) {
@@ -198,20 +171,31 @@ export function EventProvider({ children }) {
         return item;
       });
 
-      return {
-        ...prev,
-        checklist: updatedChecklist,
-      };
+      return { ...prev, checklist: updatedChecklist };
     });
   }, []);
 
   /**
-   * Resets active event data and clears local cache.
+   * Immutably adds a new task to the event checklist and syncs state.
+   */
+  const addTask = useCallback((newTask) => {
+    if (!newTask || !newTask.task) return;
+    setEventData((prev) => {
+      if (!prev) return prev;
+      const currentList = Array.isArray(prev.checklist) ? prev.checklist : [];
+      return { ...prev, checklist: [...currentList, newTask] };
+    });
+  }, []);
+
+  /**
+   * Resets active event data and clears local cache and historical inputs.
    */
   const resetPlan = useCallback(() => {
     setEventData(null);
+    setLastParams(null);
     setError(null);
     safeSetStorage(EVENT_PLAN_STORAGE_KEY, null);
+    safeSetStorage(FORM_DATA_STORAGE_KEY, null);
   }, []);
 
   const value = {
@@ -225,6 +209,7 @@ export function EventProvider({ children }) {
     updateScenario,
     applyTradeOff,
     toggleTask,
+    addTask,
     resetPlan,
   };
 

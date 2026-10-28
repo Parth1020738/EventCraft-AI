@@ -12,6 +12,7 @@ import {
   Tag 
 } from 'lucide-react';
 import { useEventContext } from '../../context/EventContext';
+import { sanitizeFileName } from '../../utils/sanitizers';
 
 /**
  * Fallback aesthetic color swatches if plan does not provide a palette.
@@ -33,23 +34,37 @@ export default function ThemeShowcase() {
   const { themeSuggestions, decorIdeas, invitationPhrasing, entertainmentSuggestions } = eventData.creativeIdeas;
   const colorPalette = eventData.summary.colorPalette || DEFAULT_COLOR_PALETTE;
 
-  const handleCopyText = (text, index) => {
-    navigator.clipboard.writeText(text);
-    setCopiedIndex(index);
-    setTimeout(() => setCopiedIndex(null), 2000);
+  const handleCopyText = async (text, index) => {
+    try {
+      if (navigator?.clipboard?.writeText) {
+        await navigator.clipboard.writeText(text);
+        setCopiedIndex(index);
+        setTimeout(() => setCopiedIndex(null), 2000);
+      }
+    } catch (err) {
+      console.warn('Clipboard write text rejected:', err);
+    }
   };
 
-  const handleCopyHex = (hex) => {
-    navigator.clipboard.writeText(hex);
-    setCopiedHex(hex);
-    setTimeout(() => setCopiedHex(null), 2000);
+  const handleCopyHex = async (hex) => {
+    try {
+      if (navigator?.clipboard?.writeText) {
+        await navigator.clipboard.writeText(hex);
+        setCopiedHex(hex);
+        setTimeout(() => setCopiedHex(null), 2000);
+      }
+    } catch (err) {
+      console.warn('Clipboard write hex rejected:', err);
+    }
   };
 
   const handleExportJSON = () => {
+    const rawTitle = eventData?.summary?.title || 'Celebration_Plan';
+    const safeTitle = sanitizeFileName(rawTitle);
     const dataStr = 'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(eventData, null, 2));
     const downloadAnchor = document.createElement('a');
     downloadAnchor.setAttribute('href', dataStr);
-    downloadAnchor.setAttribute('download', `${eventData.summary.title.replace(/\s+/g, '_')}_Plan.json`);
+    downloadAnchor.setAttribute('download', `${safeTitle}.json`);
     document.body.appendChild(downloadAnchor);
     downloadAnchor.click();
     downloadAnchor.remove();

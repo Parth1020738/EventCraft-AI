@@ -1,5 +1,6 @@
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { getFallbackEventPlan } from './fallbackPlan';
+import { sanitizePromptInput, isValidPlanStructure } from '../utils/sanitizers';
 
 /**
  * Access Gemini API Key from Vite environment variables.
@@ -10,38 +11,61 @@ const genAI = API_KEY ? new GoogleGenerativeAI(API_KEY) : null;
 
 /**
  * Builds the comprehensive structured prompt for the Gemini 1.5 model.
+ * All inputs are strictly sanitized to prevent prompt injection or JSON format corruption.
  *
  * @param {Object} params - User constraints
  * @returns {string} Prompt string
  */
 function buildGeminiPrompt(params) {
+  const safeEventType = sanitizePromptInput(params.eventType, 50) || 'Celebration';
+  const safeCurrency = sanitizePromptInput(params.currency, 10) || 'USD';
+  const safeLocation = sanitizePromptInput(params.locationType, 80) || 'Indoor / Flexible';
+  const safeDate = sanitizePromptInput(params.targetDate, 30) || 'Upcoming in 3 months';
+  const safeExperience = sanitizePromptInput(params.desiredExperience, 80) || 'Intimate & Heartfelt';
+  const safeTheme = sanitizePromptInput(params.theme, 120) || 'Elegant and memorable';
+  const safeNotes = sanitizePromptInput(params.notes, 300) || 'None';
+  const safeGuests = Math.max(1, Math.min(100000, Number(params.guestCount) || 50));
+  const safeBudget = Math.max(100, Number(params.budget) || 5000);
+
+  const safeMustHaves = Array.isArray(params.mustHaves)
+    ? params.mustHaves.map((m) => sanitizePromptInput(m, 50)).join(', ')
+    : 'Professional Photography';
+
+  const safeAccessibility = Array.isArray(params.accessibility)
+    ? params.accessibility.map((a) => sanitizePromptInput(a, 50)).join(', ')
+    : 'Wheelchair / Step-Free Access';
+
+  const safeCultural = Array.isArray(params.culturalPreferences)
+    ? params.culturalPreferences.map((c) => sanitizePromptInput(c, 50)).join(', ')
+    : 'Traditional Ceremonial Rituals';
+
   return `Generate a comprehensive, structured event plan with the following constraints:
-- Event Type: ${params.eventType || 'Celebration'}
-- Total Budget: ${params.budget || 5000} ${params.currency || 'USD'}
-- Guest Count: ${params.guestCount || 50} guests
-- Location Type: ${params.locationType || 'Indoor / Flexible'}
-- Target Date: ${params.targetDate || 'Upcoming in 3 months'}
-- Desired Experience & Atmosphere: ${params.desiredExperience || 'Intimate & Heartfelt'}
-- Theme / Preferences: ${params.theme || 'Elegant and memorable'}
-- Non-Negotiable Must-Haves: ${Array.isArray(params.mustHaves) ? params.mustHaves.join(', ') : 'Professional Photography'}
-- Accessibility & Dietary Needs: ${Array.isArray(params.accessibility) ? params.accessibility.join(', ') : 'Wheelchair / Step-Free Access'}
-- Cultural Customs: ${Array.isArray(params.culturalPreferences) ? params.culturalPreferences.join(', ') : 'Traditional Ceremonial Rituals'}
-- Special Notes: ${params.notes || 'None'}
+- Event Type: ${safeEventType}
+- Total Budget: ${safeBudget} ${safeCurrency}
+- Guest Count: ${safeGuests} guests
+- Location Type: ${safeLocation}
+- Target Date: ${safeDate}
+- Desired Experience & Atmosphere: ${safeExperience}
+- Theme / Preferences: ${safeTheme}
+- Non-Negotiable Must-Haves: ${safeMustHaves}
+- Accessibility & Dietary Needs: ${safeAccessibility}
+- Cultural Customs: ${safeCultural}
+- Special Notes: ${safeNotes}
 
 The JSON output MUST adhere strictly to this schema:
 {
   "summary": {
     "title": "Descriptive Event Name",
-    "eventType": "${params.eventType || 'Celebration'}",
+    "eventType": "${safeEventType}",
     "theme": "Creative theme summary",
     "description": "2-3 sentence evocative event vision",
-    "estimatedGuests": ${Number(params.guestCount) || 50},
-    "locationType": "${params.locationType || 'Indoor / Flexible'}",
+    "estimatedGuests": ${safeGuests},
+    "locationType": "${safeLocation}",
     "colorPalette": ["#Hex1", "#Hex2", "#Hex3", "#Hex4"]
   },
   "budget": {
-    "totalBudget": ${Number(params.budget) || 5000},
-    "currency": "${params.currency || 'USD'}",
+    "totalBudget": ${safeBudget},
+    "currency": "${safeCurrency}",
     "allocations": [
       {
         "category": "Venue & Facilities",
@@ -121,20 +145,10 @@ The JSON output MUST adhere strictly to this schema:
 
 /**
  * Generates an end-to-end event plan using Google Gemini API with structured JSON output.
- * If the API key is not provided or the request fails, seamlessly falls back to static deterministic data.
+ * If the API key is not provided, the request fails, or the response structure is invalid,
+ * it seamlessly falls back to deterministic blueprint data.
  *
  * @param {Object} params - Event specifications
- * @param {string} params.eventType - e.g. "Wedding", "Birthday", "Anniversary", "Community Gathering"
- * @param {number|string} params.budget - Total available budget
- * @param {number|string} params.guestCount - Anticipated number of guests
- * @param {string} [params.targetDate] - Target date string
- * @param {string} [params.locationType] - e.g. "Indoor Banquet", "Outdoor Garden", "Beachfront"
- * @param {string} [params.theme] - Theme preference or special notes
- * @param {string} [params.desiredExperience] - Atmosphere preference
- * @param {string[]} [params.mustHaves] - Non-negotiable elements
- * @param {string[]} [params.accessibility] - Dietary and physical accommodations
- * @param {string[]} [params.culturalPreferences] - Cultural and ceremonial traditions
- * @param {string} [params.notes] - Custom requirements
  * @returns {Promise<Object>} Structured event plan object
  */
 export async function generateEventPlan(params) {
@@ -161,7 +175,14 @@ Ensure timelines are logical and checklist items actionable. Output pure JSON on
     
     // Clean possible markdown code fences if present
     const cleanedText = text.replace(/^```json\s*/i, '').replace(/\s*```$/i, '').trim();
-    return JSON.parse(cleanedText);
+    const parsedPlan = JSON.parse(cleanedText);
+
+    if (!isValidPlanStructure(parsedPlan)) {
+      console.warn('Gemini response failed structural verification; falling back to resilient blueprint.');
+      return getFallbackEventPlan(params);
+    }
+
+    return parsedPlan;
   } catch (error) {
     console.error('Gemini API execution error, switching to fallback state:', error);
     return getFallbackEventPlan(params);
