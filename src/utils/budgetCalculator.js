@@ -4,9 +4,38 @@
  */
 
 /**
+ * Predefined percentage adjustments per category for strategic trade-off shifts.
+ */
+export const TRADE_OFF_ADJUSTMENTS = {
+  GASTRONOMY_FOCUS: {
+    'Catering & Beverages': 8,
+    'Decor & Ambiance': -5,
+    'Logistics & Contingency': -3,
+  },
+  MEDIA_FOCUS: {
+    'Entertainment & Photography': 7,
+    'Decor & Ambiance': -4,
+    'Logistics & Contingency': -3,
+  },
+  VENUE_FOCUS: {
+    'Venue & Facilities': 8,
+    'Decor & Ambiance': -4,
+    'Entertainment & Photography': -2,
+    'Logistics & Contingency': -2,
+  },
+  INFLATION_BUFFER: {
+    'Logistics & Contingency': 8,
+    'Decor & Ambiance': -3,
+    'Venue & Facilities': -3,
+    'Catering & Beverages': -2,
+  },
+};
+
+/**
  * Calculates the sum of all itemized category allocations.
- * @param {Array<{ allocatedAmount: number }>} allocations
- * @returns {number} Total budget
+ *
+ * @param {Array<{ allocatedAmount: number }>} [allocations=[]] - Category items
+ * @returns {number} Total budget sum
  */
 export function calculateTotalBudget(allocations = []) {
   if (!Array.isArray(allocations)) return 0;
@@ -15,9 +44,10 @@ export function calculateTotalBudget(allocations = []) {
 
 /**
  * Calculates the percentage of a given amount relative to total budget.
- * Safely handles 0 total without division by zero.
- * @param {number} amount
- * @param {number} totalBudget
+ * Safely handles 0 total without division by zero errors.
+ *
+ * @param {number} amount - Category amount
+ * @param {number} totalBudget - Total budget
  * @returns {number} Integer percentage (0 to 100)
  */
 export function calculateCategoryPercentage(amount, totalBudget) {
@@ -31,10 +61,10 @@ export function calculateCategoryPercentage(amount, totalBudget) {
  * Updates an itemized allocation amount and normalizes all category percentages.
  * Clamps negative amounts to 0.
  *
- * @param {Array<{ category: string, allocatedAmount: number, percentage: number }>} allocations
- * @param {string} categoryToUpdate
- * @param {number} newAmount
- * @returns {{ allocations: Array<Object>, totalBudget: number }}
+ * @param {Array<{ category: string, allocatedAmount: number, percentage: number }>} [allocations=[]]
+ * @param {string} categoryToUpdate - Category key to update
+ * @param {number} newAmount - New monetary amount
+ * @returns {{ allocations: Array<Object>, totalBudget: number }} Recalculated state
  */
 export function recalculateAllocations(allocations = [], categoryToUpdate, newAmount) {
   if (!Array.isArray(allocations) || allocations.length === 0) {
@@ -67,10 +97,11 @@ export function recalculateAllocations(allocations = [], categoryToUpdate, newAm
 }
 
 /**
- * Checks if the sum of category allocations equals the target total budget.
- * @param {Array<{ allocatedAmount: number }>} allocations
- * @param {number} expectedTotal
- * @returns {boolean}
+ * Checks if the sum of category allocations equals the target total budget within floating point tolerance.
+ *
+ * @param {Array<{ allocatedAmount: number }>} [allocations=[]] - Category items
+ * @param {number} expectedTotal - Expected total amount
+ * @returns {boolean} True if budget allocations match expected total
  */
 export function isBudgetBalanced(allocations = [], expectedTotal) {
   const currentTotal = calculateTotalBudget(allocations);
@@ -81,10 +112,10 @@ export function isBudgetBalanced(allocations = [], expectedTotal) {
  * Recalculates an event budget when scenario parameters change (Guest count or Total budget)
  * without forcing the user to restart planning from scratch.
  *
- * @param {Array<Object>} allocations - Existing category allocations
+ * @param {Array<Object>} [allocations=[]] - Existing category allocations
  * @param {number} newTotalBudget - New target budget
- * @param {number} oldGuests - Previous guest headcount
- * @param {number} newGuests - Updated guest headcount
+ * @param {number} [oldGuests=50] - Previous guest headcount
+ * @param {number} [newGuests=50] - Updated guest headcount
  * @returns {Array<Object>} Updated allocations with rebalanced amounts
  */
 export function recalculateScenario(allocations = [], newTotalBudget, oldGuests = 50, newGuests = 50) {
@@ -124,8 +155,8 @@ export function recalculateScenario(allocations = [], newTotalBudget, oldGuests 
 /**
  * Applies strategic budget trade-off shifts when constraints change or expenses spike.
  *
- * @param {Array<Object>} allocations
- * @param {'GASTRONOMY_FOCUS' | 'MEDIA_FOCUS' | 'VENUE_FOCUS' | 'INFLATION_BUFFER'} strategy
+ * @param {Array<Object>} [allocations=[]] - Existing category allocations
+ * @param {'GASTRONOMY_FOCUS' | 'MEDIA_FOCUS' | 'VENUE_FOCUS' | 'INFLATION_BUFFER'} strategy - Trade-off strategy id
  * @returns {Array<Object>} Rebalanced allocations
  */
 export function applyTradeOffStrategy(allocations = [], strategy) {
@@ -134,33 +165,7 @@ export function applyTradeOffStrategy(allocations = [], strategy) {
   const total = calculateTotalBudget(allocations);
   if (total <= 0) return allocations;
 
-  // Define percentage adjustments per category for each strategy
-  const adjustments = {
-    GASTRONOMY_FOCUS: {
-      'Catering & Beverages': 8,
-      'Decor & Ambiance': -5,
-      'Logistics & Contingency': -3,
-    },
-    MEDIA_FOCUS: {
-      'Entertainment & Photography': 7,
-      'Decor & Ambiance': -4,
-      'Logistics & Contingency': -3,
-    },
-    VENUE_FOCUS: {
-      'Venue & Facilities': 8,
-      'Decor & Ambiance': -4,
-      'Entertainment & Photography': -2,
-      'Logistics & Contingency': -2,
-    },
-    INFLATION_BUFFER: {
-      'Logistics & Contingency': 8,
-      'Decor & Ambiance': -3,
-      'Venue & Facilities': -3,
-      'Catering & Beverages': -2,
-    },
-  };
-
-  const deltaMap = adjustments[strategy];
+  const deltaMap = TRADE_OFF_ADJUSTMENTS[strategy];
   if (!deltaMap) return allocations;
 
   const adjusted = allocations.map((item) => {

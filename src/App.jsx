@@ -23,6 +23,36 @@ import CountdownTimeline from './components/dashboard/CountdownTimeline';
 import VendorChecklist from './components/dashboard/VendorChecklist';
 import ThemeShowcase from './components/dashboard/ThemeShowcase';
 
+/**
+ * Currency code to display symbol mapping.
+ */
+const CURRENCY_SYMBOL_MAP = {
+  USD: '$',
+  INR: '₹',
+  EUR: '€',
+  GBP: '£',
+};
+
+/**
+ * Dashboard navigation tab definitions.
+ */
+const DASHBOARD_TABS = [
+  { id: 'all', label: 'Overview & All Sections', icon: Layers },
+  { id: 'budget', label: 'Budget Allocations', icon: DollarSign },
+  { id: 'scenarios', label: 'Scenario Recalculator', icon: RefreshCw },
+  { id: 'tradeoffs', label: 'Trade-Off Advisor', icon: Scale },
+  { id: 'timeline', label: 'Master Itinerary', icon: Clock },
+  { id: 'checklist', label: 'Vendor Checklist', icon: CheckSquare },
+  { id: 'concepts', label: 'Themes & Ideas', icon: Palette },
+];
+
+/**
+ * Primary application presentation component.
+ * Handles top navigation, wizard onboarding view, error boundary displays,
+ * and multi-tab interactive dashboard routing.
+ *
+ * @returns {import('react').JSX.Element}
+ */
 function MainAppContent() {
   const { 
     eventData, 
@@ -44,15 +74,8 @@ function MainAppContent() {
     }
   };
 
-  const currencySymbolMap = {
-    USD: '$',
-    INR: '₹',
-    EUR: '€',
-    GBP: '£',
-  };
-
   const currencySymbol = eventData?.budget?.currency 
-    ? (currencySymbolMap[eventData.budget.currency] || eventData.budget.currency) 
+    ? (CURRENCY_SYMBOL_MAP[eventData.budget.currency] || eventData.budget.currency) 
     : '$';
 
   return (
@@ -178,15 +201,7 @@ function MainAppContent() {
 
             {/* Dashboard View Tabs */}
             <div className="flex items-center gap-2 border-b border-slate-200 pb-3 overflow-x-auto">
-              {[
-                { id: 'all', label: 'Overview & All Sections', icon: Layers },
-                { id: 'budget', label: 'Budget Allocations', icon: DollarSign },
-                { id: 'scenarios', label: 'Scenario Recalculator', icon: RefreshCw },
-                { id: 'tradeoffs', label: 'Trade-Off Advisor', icon: Scale },
-                { id: 'timeline', label: 'Master Itinerary', icon: Clock },
-                { id: 'checklist', label: 'Vendor Checklist', icon: CheckSquare },
-                { id: 'concepts', label: 'Themes & Ideas', icon: Palette },
-              ].map((tab) => {
+              {DASHBOARD_TABS.map((tab) => {
                 const Icon = tab.icon;
                 const isActive = activeTab === tab.id;
                 return (
@@ -240,6 +255,11 @@ function MainAppContent() {
   );
 }
 
+/**
+ * Root Application component wrapped with the global EventProvider context.
+ *
+ * @returns {import('react').JSX.Element}
+ */
 export default function App() {
   return (
     <EventProvider>

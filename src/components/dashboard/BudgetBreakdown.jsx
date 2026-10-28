@@ -1,11 +1,14 @@
 import { useState } from 'react';
 import { 
   DollarSign, 
-  HelpCircle,
-  AlertCircle
+  HelpCircle, 
+  AlertCircle 
 } from 'lucide-react';
 import { useEventContext } from '../../context/EventContext';
 
+/**
+ * Aesthetic styling definitions for budget breakdown categories.
+ */
 const CATEGORY_COLORS = [
   { bg: 'bg-indigo-600', text: 'text-indigo-600', ring: 'ring-indigo-500', hex: '#4F46E5' },
   { bg: 'bg-violet-600', text: 'text-violet-600', ring: 'ring-violet-500', hex: '#7C3AED' },
@@ -19,7 +22,8 @@ const CATEGORY_COLORS = [
  * Interactive Budget Allocation Breakdown with real-time sliders and dynamic distribution visualization.
  *
  * @param {Object} props
- * @param {string} props.currencySymbol - e.g. '$', '₹', '€', '£'
+ * @param {string} [props.currencySymbol='$'] - Display currency symbol (e.g. '$', '₹', '€', '£')
+ * @returns {import('react').JSX.Element|null}
  */
 export default function BudgetBreakdown({ currencySymbol = '$' }) {
   const { eventData, updateBudgetCategory } = useEventContext();

@@ -8,7 +8,8 @@ import { useEventContext } from '../../context/EventContext';
  * and dynamically recalculates the live plan without forcing a restart.
  *
  * @param {Object} props
- * @param {string} props.currencySymbol
+ * @param {string} [props.currencySymbol='$'] - Active currency symbol
+ * @returns {import('react').JSX.Element}
  */
 export default function ScenarioRecalculator({ currencySymbol = '$' }) {
   const { eventData, lastParams, updateScenario } = useEventContext();
@@ -158,7 +159,7 @@ export default function ScenarioRecalculator({ currencySymbol = '$' }) {
             className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold shadow-sm shadow-indigo-200 transition-colors focus-visible:outline-2 focus-visible:outline-indigo-600"
           >
             <RefreshCw className="w-3.5 h-3.5" />
-            Apply Scenario Recalculation
+            Recalculate Plan
           </button>
         </div>
       </form>

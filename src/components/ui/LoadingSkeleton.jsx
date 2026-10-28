@@ -1,6 +1,9 @@
 import { useState, useEffect } from 'react';
 import { Sparkles } from 'lucide-react';
 
+/**
+ * Sequential status messages displayed during AI plan orchestration.
+ */
 const GENERATION_STAGES = [
   'Synthesizing guest volume and venue acoustics...',
   'Balancing vendor budget allocations and contingency reserves...',
@@ -12,6 +15,8 @@ const GENERATION_STAGES = [
 /**
  * Animated shimmer loading skeleton displayed while Gemini generates the event plan.
  * Features rotating status messages and ARIA polite live announcement.
+ *
+ * @returns {import('react').JSX.Element}
  */
 export default function LoadingSkeleton() {
   const [stageIndex, setStageIndex] = useState(0);

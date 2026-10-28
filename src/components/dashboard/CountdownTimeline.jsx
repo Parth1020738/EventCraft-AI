@@ -9,7 +9,10 @@ import {
 import { useEventContext } from '../../context/EventContext';
 
 /**
- * Calculates remaining days, hours, minutes, and seconds until target date.
+ * Calculates remaining days, hours, minutes, and seconds until the target celebration date.
+ *
+ * @param {string} targetDateStr - Target celebration date (YYYY-MM-DD)
+ * @returns {{ days: number, hours: number, minutes: number, seconds: number, isPast: boolean } | null}
  */
 function calculateTimeRemaining(targetDateStr) {
   if (!targetDateStr) return null;
@@ -31,7 +34,10 @@ function calculateTimeRemaining(targetDateStr) {
 }
 
 /**
- * Master Countdown and Interactive Event Timeline with phase filtering and milestone checklists.
+ * Master Countdown and Interactive Event Timeline with phase filtering,
+ * live countdown clock, milestone completion toggles, and sequential prerequisite links.
+ *
+ * @returns {import('react').JSX.Element|null}
  */
 export default function CountdownTimeline() {
   const { eventData, lastParams } = useEventContext();

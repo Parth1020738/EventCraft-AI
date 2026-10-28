@@ -8,13 +8,20 @@ import {
   Printer, 
   PartyPopper, 
   Flame, 
-  MessageSquareQuote,
-  Tag
+  MessageSquareQuote, 
+  Tag 
 } from 'lucide-react';
 import { useEventContext } from '../../context/EventContext';
 
 /**
+ * Fallback aesthetic color swatches if plan does not provide a palette.
+ */
+const DEFAULT_COLOR_PALETTE = ['#4F46E5', '#7C3AED', '#F59E0B', '#F43F5E'];
+
+/**
  * Creative Theme & Idea Showcase with interactive color swatches, invitation phrasings, and plan export.
+ *
+ * @returns {import('react').JSX.Element|null}
  */
 export default function ThemeShowcase() {
   const { eventData } = useEventContext();
@@ -24,7 +31,7 @@ export default function ThemeShowcase() {
   if (!eventData?.creativeIdeas) return null;
 
   const { themeSuggestions, decorIdeas, invitationPhrasing, entertainmentSuggestions } = eventData.creativeIdeas;
-  const colorPalette = eventData.summary.colorPalette || ['#4F46E5', '#7C3AED', '#F59E0B', '#F43F5E'];
+  const colorPalette = eventData.summary.colorPalette || DEFAULT_COLOR_PALETTE;
 
   const handleCopyText = (text, index) => {
     navigator.clipboard.writeText(text);

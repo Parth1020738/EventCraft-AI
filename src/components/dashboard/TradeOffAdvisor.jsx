@@ -2,6 +2,9 @@ import { useState } from 'react';
 import { Scale, Utensils, Camera, Building2, ShieldAlert, Check, ArrowRight } from 'lucide-react';
 import { useEventContext } from '../../context/EventContext';
 
+/**
+ * Curated trade-off strategies for rebalancing allocations under varying priorities.
+ */
 const TRADE_OFF_STRATEGIES = [
   {
     id: 'GASTRONOMY_FOCUS',
@@ -48,6 +51,8 @@ const TRADE_OFF_STRATEGIES = [
 /**
  * Trade-Off Advisor Component.
  * Implements the PromptWars Challenge 05 Explainer Seminar core trade-off decision engine.
+ *
+ * @returns {import('react').JSX.Element}
  */
 export default function TradeOffAdvisor() {
   const { applyTradeOff } = useEventContext();

@@ -7,6 +7,7 @@ import { AlertTriangle, RefreshCw, Zap } from 'lucide-react';
  * @param {string} [props.message] - Error message description
  * @param {Function} [props.onRetry] - Function to trigger retry
  * @param {Function} [props.onFallback] - Function to load deterministic blueprint
+ * @returns {import('react').JSX.Element}
  */
 export default function ErrorMessage({ message, onRetry, onFallback }) {
   return (

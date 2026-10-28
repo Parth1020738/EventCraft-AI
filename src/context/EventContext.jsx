@@ -5,62 +5,46 @@ import {
   recalculateScenario, 
   applyTradeOffStrategy 
 } from '../utils/budgetCalculator';
+import {
+  safeGetStorage,
+  safeSetStorage,
+  EVENT_PLAN_STORAGE_KEY,
+  FORM_DATA_STORAGE_KEY
+} from '../utils/storage';
 
-const STORAGE_KEY = 'eventcraft_ai_event_plan';
-const FORM_DATA_KEY = 'eventcraft_ai_last_form_data';
-
+/**
+ * React Context for EventCraft AI global state management.
+ */
 const EventContext = createContext(null);
 
 /**
- * Safely read from localStorage without crashing in incognito/restricted environments.
- */
-function safeGetStorage(key) {
-  try {
-    const raw = localStorage.getItem(key);
-    return raw ? JSON.parse(raw) : null;
-  } catch (err) {
-    console.warn(`Could not read '${key}' from localStorage:`, err);
-    return null;
-  }
-}
-
-/**
- * Safely write to localStorage without crashing in quota or privacy restricted contexts.
- */
-function safeSetStorage(key, value) {
-  try {
-    if (value === null || value === undefined) {
-      localStorage.removeItem(key);
-    } else {
-      localStorage.setItem(key, JSON.stringify(value));
-    }
-  } catch (err) {
-    console.warn(`Could not persist '${key}' to localStorage:`, err);
-  }
-}
-
-/**
- * EventProvider component wrapping the application to supply global event state.
+ * EventProvider component wrapping the application to supply global event state,
+ * generator triggers, interactive budget rebalancing, and local persistence.
+ *
+ * @param {Object} props
+ * @param {import('react').ReactNode} props.children - Child elements
+ * @returns {import('react').JSX.Element}
  */
 export function EventProvider({ children }) {
-  const [eventData, setEventData] = useState(() => safeGetStorage(STORAGE_KEY));
-  const [lastParams, setLastParams] = useState(() => safeGetStorage(FORM_DATA_KEY));
+  const [eventData, setEventData] = useState(() => safeGetStorage(EVENT_PLAN_STORAGE_KEY));
+  const [lastParams, setLastParams] = useState(() => safeGetStorage(FORM_DATA_STORAGE_KEY));
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
 
   // Sync eventData changes to localStorage
   useEffect(() => {
-    safeSetStorage(STORAGE_KEY, eventData);
+    safeSetStorage(EVENT_PLAN_STORAGE_KEY, eventData);
   }, [eventData]);
 
   // Sync lastParams changes to localStorage
   useEffect(() => {
-    safeSetStorage(FORM_DATA_KEY, lastParams);
+    safeSetStorage(FORM_DATA_STORAGE_KEY, lastParams);
   }, [lastParams]);
 
   /**
    * Generates a new plan via Gemini AI or deterministic fallback.
-   * @param {Object} formData
+   * @param {Object} formData - User onboarding specifications
+   * @returns {Promise<Object>} Generated plan blueprint
    */
   const generatePlan = useCallback(async (formData) => {
     setIsLoading(true);
@@ -85,6 +69,8 @@ export function EventProvider({ children }) {
 
   /**
    * Fail-safe helper: Load fallback blueprint immediately on request.
+   * @param {Object} [customParams] - Optional parameters to override defaults
+   * @returns {Object} Deterministic fallback blueprint
    */
   const loadFallbackBlueprint = useCallback((customParams) => {
     setIsLoading(false);
@@ -104,8 +90,8 @@ export function EventProvider({ children }) {
 
   /**
    * Updates an itemized budget category amount and recalibrates total and percentages.
-   * @param {string} categoryName
-   * @param {number} newAmount
+   * @param {string} categoryName - Category to adjust
+   * @param {number} newAmount - New monetary amount
    */
   const updateBudgetCategory = useCallback((categoryName, newAmount) => {
     setEventData((prev) => {
@@ -131,10 +117,10 @@ export function EventProvider({ children }) {
   /**
    * Recalculates plan dynamically when scenario changes (guest count or budget)
    * without restarting from scratch.
-   * @param {Object} scenarioParams
-   * @param {number} [scenarioParams.budget]
-   * @param {number} [scenarioParams.guestCount]
-   * @param {string} [scenarioParams.targetDate]
+   * @param {Object} scenarioParams - Scenario adjustment parameters
+   * @param {number} [scenarioParams.budget] - Updated total budget
+   * @param {number} [scenarioParams.guestCount] - Updated headcount
+   * @param {string} [scenarioParams.targetDate] - Updated target date
    */
   const updateScenario = useCallback(({ budget, guestCount, targetDate }) => {
     setEventData((prev) => {
@@ -196,7 +182,7 @@ export function EventProvider({ children }) {
 
   /**
    * Toggles task status in the checklist between 'To Do' -> 'In Progress' -> 'Completed'.
-   * @param {string} taskId
+   * @param {string} taskId - Unique task identifier
    */
   const toggleTask = useCallback((taskId) => {
     setEventData((prev) => {
@@ -225,7 +211,7 @@ export function EventProvider({ children }) {
   const resetPlan = useCallback(() => {
     setEventData(null);
     setError(null);
-    safeSetStorage(STORAGE_KEY, null);
+    safeSetStorage(EVENT_PLAN_STORAGE_KEY, null);
   }, []);
 
   const value = {
@@ -247,6 +233,9 @@ export function EventProvider({ children }) {
 
 /**
  * Custom hook to safely consume EventContext.
+ *
+ * @throws {Error} If called outside of an EventProvider
+ * @returns {Object} Event context state and actions
  */
 export function useEventContext() {
   const context = useContext(EventContext);
